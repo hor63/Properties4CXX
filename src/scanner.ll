@@ -4,6 +4,8 @@
 /* --  The C interface and declaration section  ---------------------------- */
 /* ------------------------------------------------------------------------- */
 
+#include <cstring>
+#include <cstdlib>
 #include "parser.hh"
 
 
@@ -23,7 +25,6 @@ extern long  yy_curr_column;
 /* --  Some usefull abbreviations  ----------------------------------------- */
 /* ------------------------------------------------------------------------- */
 
-idf      [a-zA-Z_][a-zA-Z0-9_$]*
 hexdig   [0-9a-fA-F]
 decnum   [1-9][0-9]*
 hexnum   0[xX]{hexdig}+
@@ -71,14 +72,32 @@ commCont ([^*]|"*"+[^/*])*
              return LEX_END_OF_LINE;
          }
 
-
+"{"		{
+			yy_curr_column++;
+			return LEX_BRACKETOPEN;
+		}
+		 
+"}"		{
+			yy_curr_column++;
+			return LEX_BRACKETOPEN;
+		}
+		 
+","		{
+			yy_curr_column++;
+			return LEX_COMMA;
+		}
+		 
+"="		{
+			yy_curr_column++;
+			return LEX_ASSIGN;
+		}
 
                                         
 [ \t\xc]    { /* Blank, Tab, Form feed */
              yy_curr_column += strlen(yytext);
             }
 
-{decnum}                              {
+[+-]?{decnum}                              {
                                         yylval.numVal = strtol((char *)(yytext),NULL,0);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_INTEGER); 
@@ -121,68 +140,6 @@ commCont ([^*]|"*"+[^/*])*
                                       }
 
 
-\'.\'                                  {
-                                        yylval.chr = yytext[1];
-                                        yy_curr_column += strlen(yytext);
-                                        return (LEX_CHAR); 
-                                       }
-
-\'\\[0-9]+\'                           {
-                                        yylval.chr = (char)strtol((char *)(yytext+2),NULL,8);
-                                        yy_curr_column += strlen(yytext);
-                                        return (LEX_CHAR); 
-                                       }
-
-\'\\x[0-9a-fA-F]+\'                    {
-                                        yylval.chr = (char)strtol((char *)(yytext+3),NULL,16);
-                                        yy_curr_column += strlen(yytext);
-                                        return (LEX_CHAR); 
-                                       }
-
-\'\\[abfnrtv\\?\'\"0]\'                  {
-                                        switch (yytext[2])
-                                          {
-                                          case 'a':
-                                              yylval.chr = '\a';
-                                              break;
-                                          case 'b':
-                                              yylval.chr = '\b';
-                                              break;
-                                          case 'f':
-                                              yylval.chr = '\f';
-                                              break;
-                                          case 'n':
-                                              yylval.chr = '\n';
-                                              break;
-                                          case 'r':
-                                              yylval.chr = '\r';
-                                              break;
-                                          case 't':
-                                              yylval.chr = '\t';
-                                              break;
-                                          case 'v':
-                                              yylval.chr = '\v';
-                                              break;
-                                          case '\\':
-                                              yylval.chr = '\\';
-                                              break;
-                                          case '?':
-                                              yylval.chr = '\?';
-                                              break;
-                                          case '\'':
-                                              yylval.chr = '\'';
-                                              break;
-                                          case '"':
-                                              yylval.chr = '"';
-                                              break;
-                                          case '0':
-                                              yylval.chr = '\0';
-                                              break;
-
-                                          }
-                                        yy_curr_column += strlen(yytext);
-                                        return (LEX_CHAR); 
-                                       }
 
 \"([^\"]|(\\\"))*\"                    {
                                         yylval.string = new char[strlen(yytext) + 1];
@@ -198,14 +155,14 @@ commCont ([^*]|"*"+[^/*])*
 
 
 
-{idf}                                  {
+[^\r\n \xc\t\"\{\},=]+	                      {
                                         yylval.string = new char[strlen(yytext)+1];
                                         strcpy(yylval.string, yytext);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_IDENTIFIER);
                                        }
 
-
+									   
 %%
  /* ------------------------------------------------------------------------- */
  /* --  The function section  ----------------------------------------------- */

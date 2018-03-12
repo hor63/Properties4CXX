@@ -28,7 +28,7 @@ void yy_free_string_buffer ();
 
 
 
-// Sei Schwatzhaft mit Fehlermeldungen
+// Be chatty at error messages
 #define YYERROR_VERBOSE
 
 %}
@@ -40,31 +40,33 @@ void yy_free_string_buffer ();
 %start properties
 
 %union {
-char                 chr;
-char*                string;
-double               numVal;
+char*	string;
+double	numVal;
+long	intVal;
 }
 
 
 %token <string>           LEX_IDENTIFIER
 %token <string>           LEX_STRING
-%token <chr>              LEX_CHAR
 %token <numVal>           LEX_DOUBLE
-%token <numVal>           LEX_INTEGER
+%token <intVal>           LEX_INTEGER
 
 
-/* parenthesis, separators etc. */
-%token             LEX_ILLCHAR
+/* brackets, separators etc. */
 %token             LEX_BRACKETOPEN
 %token             LEX_BRACKETCLOSE
 %token             LEX_COMMA
 %token             LEX_ASSIGN
-%token  <string>   LEX_END_OF_LINE
+%token  		   LEX_END_OF_LINE
 
 
 
 /* The types of the the rules return */
-%type  <string>        property
+%type <string>		stringVal
+%type <string>		property
+%type <string>		simpleProperty
+%type <numVal>		numProperty
+%type <intVal>		intProperty
 
 
 %%
@@ -72,13 +74,46 @@ double               numVal;
 /* --  The rule section  --------------------------------------------------- */
 /* ------------------------------------------------------------------------- */
 
-properties : property 
- | properties property;
+properties : emptyLine | simpleProperty | numProperty | intProperty | propertyList | propertyStruct
+	| properties emptyLine
+	| properties simpleProperty
+	| properties numProperty
+	| properties intProperty
+	| properties propertyList
+	;
 
-property : LEX_END_OF_LINE
-    { $$ = $1; }
+emptyLine : LEX_END_OF_LINE
+	;
+ 
+stringVal : LEX_IDENTIFIER | LEX_STRING
+		{ $$ = $1; }
+	;
+ 
+simpleProperty : property LEX_END_OF_LINE 
+		{ $$ = $1; }
+	;
 
+propertyList : propertyListList LEX_END_OF_LINE;
+		
+propertyListList : property LEX_COMMA stringVal
+	| propertyListList LEX_COMMA stringVal
+	;
+		
+property : LEX_IDENTIFIER LEX_ASSIGN stringVal LEX_END_OF_LINE
+		{ $$ = $3; }
+	;
 
+numProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_DOUBLE LEX_END_OF_LINE
+		{ $$ = $3; }
+	;
+
+intProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_INTEGER LEX_END_OF_LINE
+		{ $$ = $3; }
+	;
+
+propertyStruct : LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN propertyList LEX_BRACKETCLOSE
+	;
+	
 %%
 /* ------------------------------------------------------------------------- */
 /* --  The function section  ----------------------------------------------- */
@@ -107,6 +142,8 @@ int yyerror (const char* parseMsg)
     yytext
     };
 
+	strLine.freeze(false);
+	strCol.freeze(false);
 
   return 0;
 }

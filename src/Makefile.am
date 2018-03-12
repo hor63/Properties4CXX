@@ -19,17 +19,17 @@
 
 lib_LTLIBRARIES=libProperties4CXX.la
 
-liblibProperties4CXX_la_SOURCES=scanner.l parser.y Properties.cpp
+libProperties4CXX_la_SOURCES=scanner.ll parser.yy Properties.cpp
  
-liblibProperties4CXX_la_LIBADD=$(LOG4CXX_LIBS) $(PTHREAD_LIBS)
+libProperties4CXX_la_LIBADD=$(LOG4CXX_LIBS) $(PTHREAD_LIBS)
 
-liblibProperties4CXX_la_CXXFLAGS=$(AM_CXXFLAGS) -DBUILDING_LIBPRPERTIESPP=1 $(DLL_VISIBLE_CFLAGS)
+libProperties4CXX_la_CXXFLAGS=$(AM_CXXFLAGS) -DBUILDING_LIBPRPERTIESPP=1 $(DLL_VISIBLE_CFLAGS)
 
-liblibProperties4CXX_la_LDFLAGS=$(LD_NO_UNDEFINED_OPT) $(LOG4CXX_LDFLAGS)
+libProperties4CXX_la_LDFLAGS=$(LD_NO_UNDEFINED_OPT) $(LOG4CXX_LDFLAGS)
 
 AM_CXXFLAGS = -I$(top_srcdir)/src $(LOG4CXX_CXXFLAGS) \
 	$(PTHREAD_CFLAGS)
 
-BUILT_SOURCES = parser.h
+BUILT_SOURCES = parser.hh
 AM_YFLAGS = -d
 
