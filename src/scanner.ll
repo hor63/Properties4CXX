@@ -6,6 +6,7 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <istream>
 #include "parser.hh"
 
 
@@ -17,9 +18,8 @@ extern long  yy_curr_column;
 
 %}
 
-%option noyywrap
-
-%option never-interactive
+/* Important to support UTF-8 */
+%option 8bit reentrant
 
 /* ------------------------------------------------------------------------- */
 /* --  Some usefull abbreviations  ----------------------------------------- */
@@ -115,25 +115,25 @@ commCont ([^*]|"*"+[^/*])*
                                         return (LEX_INTEGER); 
                                       }
 
-[0-9]*"."[0-9]+                       {
+[+-]?[0-9]*"."[0-9]+                       {
                                         yylval.numVal = strtod((char *)(yytext),NULL);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_DOUBLE); 
                                       }
 
-[0-9]+"."[0-9]*                       {
+[+-]?[0-9]+"."[0-9]*                       {
                                         yylval.numVal = strtod((char *)(yytext),NULL);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_DOUBLE); 
                                       }
 
-[0-9]+("."[0-9]*)?{exp}               {
+[+-]?[0-9]+("."[0-9]*)?{exp}               {
                                         yylval.numVal = strtod((char *)(yytext),NULL);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_DOUBLE); 
                                       }
 
-"."[0-9]+{exp}                        {
+[+-]?"."[0-9]+{exp}                        {
                                         yylval.numVal = strtod((char *)(yytext),NULL);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_DOUBLE); 
@@ -189,6 +189,16 @@ char *ptr = (char*)yytext;
 }
 
 static YY_BUFFER_STATE buffHandle;
+
+#ifdef __cplusplus
+extern "C" 
+#endif
+int yywrap ( yyscan_t yyscanner ) {
+
+	return 1;
+
+}
+
 
 void yy_setup_string_buffer (char* str)
 {
