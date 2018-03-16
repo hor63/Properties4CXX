@@ -10,7 +10,7 @@
 #include "parser.hh"
 
 
-static void yy_countlines (void);
+static void yy_countlines (char const* text);
 
 extern long  yy_curr_line;
 extern long  yy_curr_column;
@@ -19,7 +19,8 @@ extern long  yy_curr_column;
 %}
 
 /* Important to support UTF-8 */
-%option 8bit reentrant
+%option 8bit reentrant bison-bridge
+%option header-file="lexer.h"
 
 /* ------------------------------------------------------------------------- */
 /* --  Some usefull abbreviations  ----------------------------------------- */
@@ -98,43 +99,43 @@ commCont ([^*]|"*"+[^/*])*
             }
 
 [+-]?{decnum}                              {
-                                        yylval.numVal = strtol((char *)(yytext),NULL,0);
+                                        yylval->numVal = strtol((char *)(yytext),NULL,0);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_INTEGER); 
                                       }
 
 0[0-7]*                               {
-                                        yylval.numVal = strtoul((char *)(yytext),NULL,0);
+                                        yylval->numVal = strtoul((char *)(yytext),NULL,0);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_INTEGER); 
                                       }
 
 {hexnum}                              {
-                                        yylval.numVal = strtoul((char *)(yytext),NULL,0);
+                                        yylval->numVal = strtoul((char *)(yytext),NULL,0);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_INTEGER); 
                                       }
 
 [+-]?[0-9]*"."[0-9]+                       {
-                                        yylval.numVal = strtod((char *)(yytext),NULL);
+                                        yylval->numVal = strtod((char *)(yytext),NULL);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_DOUBLE); 
                                       }
 
 [+-]?[0-9]+"."[0-9]*                       {
-                                        yylval.numVal = strtod((char *)(yytext),NULL);
+                                        yylval->numVal = strtod((char *)(yytext),NULL);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_DOUBLE); 
                                       }
 
 [+-]?[0-9]+("."[0-9]*)?{exp}               {
-                                        yylval.numVal = strtod((char *)(yytext),NULL);
+                                        yylval->numVal = strtod((char *)(yytext),NULL);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_DOUBLE); 
                                       }
 
 [+-]?"."[0-9]+{exp}                        {
-                                        yylval.numVal = strtod((char *)(yytext),NULL);
+                                        yylval->numVal = strtod((char *)(yytext),NULL);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_DOUBLE); 
                                       }
@@ -142,13 +143,14 @@ commCont ([^*]|"*"+[^/*])*
 
 
 \"([^\"]|(\\\"))*\"                    {
-                                        yylval.string = new char[strlen(yytext) + 1];
-                                        strcpy(yylval.string, yytext+1);
+                                        yylval->string = new char[strlen(yytext) + 1];
+                                        strcpy(yylval->string, yytext+1);
 
                                         /* Hack den " am Ende ab. */
-                                        yylval.string[strlen(yylval.string) - 1] = '\0';
+                                        yylval->string[strlen(yylval->string) - 1] = '\0';
 
-                                        yy_curr_column += strlen(yytext);
+										yy_countlines (yytext);
+
                                         return (LEX_STRING); 
                                        }
 
@@ -156,8 +158,8 @@ commCont ([^*]|"*"+[^/*])*
 
 
 [^\r\n \xc\t\"\{\},=]+	                      {
-                                        yylval.string = new char[strlen(yytext)+1];
-                                        strcpy(yylval.string, yytext);
+                                        yylval->string = new char[strlen(yytext)+1];
+                                        strcpy(yylval->string, yytext);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_IDENTIFIER);
                                        }
@@ -169,13 +171,12 @@ commCont ([^*]|"*"+[^/*])*
  /* ------------------------------------------------------------------------- */
 
 
-static void yy_countlines (void)
+static void yy_countlines (char const* text)
 {
-char *ptr = (char*)yytext;
 
-   while (*ptr)
+   while (*text)
       {
-      if (*ptr == '\n')
+      if (*text == '\n')
          {
          yy_curr_line ++;
          yy_curr_column = 0;
@@ -183,7 +184,7 @@ char *ptr = (char*)yytext;
       else {
          yy_curr_column ++;
       }
-      ptr ++;
+      text ++;
       }
    
 }
@@ -200,9 +201,12 @@ int yywrap ( yyscan_t yyscanner ) {
 }
 
 
-void yy_setup_string_buffer (char* str)
+void yy_setup_string_buffer (char* str, yyscan_t scanner)
 {
-  // Lass den Scanner aus dem String scannen
+ // Stolen from the generated scanner source function yylex :)
+ struct yyguts_t * yyg = (struct yyguts_t*)scanner;
+ 
+ // Lass den Scanner aus dem String scannen
    // Mit Debugging
 #ifdef _DEBUG
    yy_flex_debug = 1;
@@ -211,12 +215,12 @@ void yy_setup_string_buffer (char* str)
 #endif
 
 
-  buffHandle = yy_scan_string (str);
+  buffHandle = yy_scan_string (str,scanner);
 }
 
-void yy_free_string_buffer ()
+void yy_free_string_buffer (yyscan_t scanner)
 {
   // Schmeiss den Puffer wieder wech, sonst gibts
   // Speicherloecher. 
-  yy_delete_buffer(buffHandle);
+  yy_delete_buffer(buffHandle,scanner);
 }

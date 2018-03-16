@@ -6,6 +6,9 @@
 #include <iostream>
 #include <strstream>
 
+#include "parser.hh"
+#include "lexer.h"
+
 long  yy_curr_line   = 1;
 long  yy_curr_column = 0;
 
@@ -14,7 +17,7 @@ long  yy_curr_column = 0;
 /* Function prototypes */
 
 /* Output of parse errors */
-int yyerror (const char* parseMsg);
+int yyerror (void *scanner,const char* parseMsg);
 
 /* The lexical scanner */
 int yylex(void);
@@ -36,6 +39,10 @@ void yy_free_string_buffer ();
 /* ------------------------------------------------------------------------- */
 /* --  The parser declaration section  ------------------------------------- */
 /* ------------------------------------------------------------------------- */
+
+%define api.pure full
+%lex-param {void *scanner}
+%parse-param {void *scanner}
 
 %start properties
 
@@ -122,7 +129,7 @@ propertyStruct : LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN propertyList LEX_BRAC
 
 using namespace std;
 
-int yyerror (const char* parseMsg)
+int yyerror (void *scanner, const char* parseMsg)
 {
 
   cerr << "Parse error in line " << yy_curr_line
