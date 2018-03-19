@@ -19,18 +19,19 @@ extern long  yy_curr_column;
 %}
 
 /* Important to support UTF-8 */
-%option 8bit reentrant bison-bridge
+%option 8bit 
+/* Support fully reentrant parser and scanner */
+%option reentrant bison-bridge
 %option header-file="lexer.h"
 
 /* ------------------------------------------------------------------------- */
-/* --  Some usefull abbreviations  ----------------------------------------- */
+/* --  Some useful abbreviations  ----------------------------------------- */
 /* ------------------------------------------------------------------------- */
 
 hexdig   [0-9a-fA-F]
 decnum   [1-9][0-9]*
 hexnum   0[xX]{hexdig}+
 exp      [eE][+-]?[0-9]+
-commCont ([^*]|"*"+[^/*])*
 
 
 /* ---------------------------------------------------------------<string>---------- */
@@ -140,6 +141,18 @@ commCont ([^*]|"*"+[^/*])*
                                         return (LEX_DOUBLE); 
                                       }
 
+[yY][eE][sS]|[tT][rR][uU][eE]|[oO][nN] {
+                                        yylval->boolVal = true;
+                                        yy_curr_column += strlen(yytext);
+                                        return (LEX_BOOL); 
+                                      }
+
+[nN][oO]|[fF][aA][lL][sS][eE]|[oO][fF][fF] {
+                                        yylval->boolVal = false;
+                                        yy_curr_column += strlen(yytext);
+                                        return (LEX_BOOL); 
+                                      }
+
 
 
 \"([^\"]|(\\\"))*\"                    {
@@ -187,40 +200,4 @@ static void yy_countlines (char const* text)
       text ++;
       }
    
-}
-
-static YY_BUFFER_STATE buffHandle;
-
-#ifdef __cplusplus
-extern "C" 
-#endif
-int yywrap ( yyscan_t yyscanner ) {
-
-	return 1;
-
-}
-
-
-void yy_setup_string_buffer (char* str, yyscan_t scanner)
-{
- // Stolen from the generated scanner source function yylex :)
- struct yyguts_t * yyg = (struct yyguts_t*)scanner;
- 
- // Lass den Scanner aus dem String scannen
-   // Mit Debugging
-#ifdef _DEBUG
-   yy_flex_debug = 1;
-#else
-   yy_flex_debug = 0;
-#endif
-
-
-  buffHandle = yy_scan_string (str,scanner);
-}
-
-void yy_free_string_buffer (yyscan_t scanner)
-{
-  // Schmeiss den Puffer wieder wech, sonst gibts
-  // Speicherloecher. 
-  yy_delete_buffer(buffHandle,scanner);
 }

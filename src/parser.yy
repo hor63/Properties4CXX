@@ -4,7 +4,8 @@
 /* ------------------------------------------------------------------------- */
 
 #include <iostream>
-#include <strstream>
+#include <sstream>
+#include <string>
 
 #include "parser.hh"
 #include "lexer.h"
@@ -16,20 +17,7 @@ long  yy_curr_column = 0;
 /**********************************************************/
 /* Function prototypes */
 
-/* Output of parse errors */
-int yyerror (void *scanner,const char* parseMsg);
-
-/* The lexical scanner */
-int yylex(void);
-
-extern char* yytext;
-
-// Routinen fuer Pufferverwaltung des Scanners, damit der aus dem String
-// scannt.
-void yy_setup_string_buffer (char* str);
-void yy_free_string_buffer ();
-
-
+int yyerror (void *scanner, const char* parseMsg);
 
 // Be chatty at error messages
 #define YYERROR_VERBOSE
@@ -50,6 +38,7 @@ void yy_free_string_buffer ();
 char*	string;
 double	numVal;
 long	intVal;
+bool    boolVal;
 }
 
 
@@ -57,6 +46,7 @@ long	intVal;
 %token <string>           LEX_STRING
 %token <numVal>           LEX_DOUBLE
 %token <intVal>           LEX_INTEGER
+%token <boolVal>          LEX_BOOL
 
 
 /* brackets, separators etc. */
@@ -74,6 +64,7 @@ long	intVal;
 %type <string>		simpleProperty
 %type <numVal>		numProperty
 %type <intVal>		intProperty
+%type <intVal>		boolProperty
 
 
 %%
@@ -81,12 +72,12 @@ long	intVal;
 /* --  The rule section  --------------------------------------------------- */
 /* ------------------------------------------------------------------------- */
 
-properties : emptyLine | simpleProperty | numProperty | intProperty | propertyList | propertyStruct
+singleProperty : simpleProperty | numProperty | intProperty | boolProperty | propertyList | propertyStruct
+	;
+
+properties : emptyLine | singleProperty 
 	| properties emptyLine
-	| properties simpleProperty
-	| properties numProperty
-	| properties intProperty
-	| properties propertyList
+	| properties singleProperty
 	;
 
 emptyLine : LEX_END_OF_LINE
@@ -118,6 +109,10 @@ intProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_INTEGER LEX_END_OF_LINE
 		{ $$ = $3; }
 	;
 
+boolProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_BOOL LEX_END_OF_LINE
+		{ $$ = $3; }
+	;
+
 propertyStruct : LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN propertyList LEX_BRACKETCLOSE
 	;
 	
@@ -135,22 +130,24 @@ int yyerror (void *scanner, const char* parseMsg)
   cerr << "Parse error in line " << yy_curr_line
     << " in column " << yy_curr_column << " is \"" << parseMsg << "\"" << endl;
 
-  ostrstream strLine;
-  ostrstream strCol;
+  ostringstream strLine;
+  ostringstream strCol;
+  string lineStr;
+  string colStr;
 
   strLine << yy_curr_line   << ends;
   strCol << yy_curr_column << ends;
 
+  lineStr = strLine.str();
+  colStr = strCol.str();
+
 
   const char* strArray [] = {
     (const char*)parseMsg,
-    strLine.str(),
-    strCol.str(),
-    yytext
+    lineStr.c_str(),
+    colStr.c_str(),
+    yyget_text(scanner)
     };
-
-	strLine.freeze(false);
-	strCol.freeze(false);
 
   return 0;
 }

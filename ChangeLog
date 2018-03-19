@@ -1,0 +1,11 @@
+2018-03-20  hor  <hor@horUbuntu>
+
+	* .cproject: New file.
+	* .project: New file.
+	* .settings/language.settings.xml: New file.
+	* .gitignore: 
+	* src/parser.yy: 
+	* src/Properties.cpp (~Properties): 
+	* src/Properties.h (Properties): 
+	* src/scanner.ll: 
+	  Creation
