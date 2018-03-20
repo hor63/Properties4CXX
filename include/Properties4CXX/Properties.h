@@ -62,11 +62,11 @@
 #endif
 
 #if defined (BUILDING_PROPERTIES4CXX)
-  #define OEV_PUBLIC PROPERTIES4CXX_DLL_EXPORT
-  #define OEV_LOCAL  PROPERTIES4CXX_DLL_LOCAL
+  #define PROPERTIES4CXX_PUBLIC PROPERTIES4CXX_DLL_EXPORT
+  #define PROPERTIES4CXX_LOCAL  PROPERTIES4CXX_DLL_LOCAL
 #else /* BUILDING_PROPERTIES4CXX */
-  #define OEV_PUBLIC PROPERTIES4CXX_DLL_IMPORT
-  #define OEV_LOCAL  PROPERTIES4CXX_DLL_LOCAL
+  #define PROPERTIES4CXX_PUBLIC PROPERTIES4CXX_DLL_IMPORT
+  #define PROPERTIES4CXX_LOCAL  PROPERTIES4CXX_DLL_LOCAL
 #endif /* BUILDING_PROPERTIES4CXX */
 
 
@@ -128,7 +128,7 @@ namespace Properties4CXX {
  *     PropTrue1 = ON
  *
  *     # Lists of values
- *     Property11 = value1," Value 2 ", sddsds
+ *     Property11 = value1," VPROPERTIES4CXX_PUBLICalue 2 ", sddsds
 
  *     # Structures
  *     Property12 = {
@@ -177,26 +177,128 @@ namespace Properties4CXX {
  *
  * Any other escaped character is taken over literally. A sequence "\\x" will become "x". The '\\' character is swallowed.
  *
+ * Numeric locale
+ * -------------------
+ *
+ * The locale is always "C", i.e. the decimal speparator is always the dot '.'. Hundred separators are not allowed.
+ *
+ * Thus a number in German locale 123,456 is not valid. Neither is a number 123,456.2323 valid input.
+ *
+ *
  */
 class Properties {
 public:
+
+	/**
+	 * Constructor. Before reading a configuration you must either set the configuration file name,
+	 * or set the input stream
+	 */
+	PROPERTIES4CXX_PUBLIC
     Properties ();
 
+    /** \brief Constructor defining the input file name
+     * Constructor defining the input file name.
+     * The file will be opened not earlier when you call \ref readConfiguration
+     *
+     * @param configFileName: Name of the configuration file. Can either be an absolute or relative path. The path
+     * specification must comply with the OS conventions
+     *
+     */
+	PROPERTIES4CXX_PUBLIC
     Properties (char const *configFileName);
 
+    /** \brief Constructor defining the input file name
+     * Constructor defining the input file name.
+     * The file will be opened not earlier when you call \ref readConfiguration
+     *
+     * @param configFileName Name of the configuration file. Can either be an absolute or relative path. The path
+     * specification must comply with the OS conventions.
+     *
+     */
+	PROPERTIES4CXX_PUBLIC
     Properties (std::string const &configFileName);
 
-    Properties (std::string const &configFileName);
-
+    /** \brief Constructor defining the input stream
+     *
+     * @param inputStream Pointer to an input stream (typically an istringstream, i.e. reading out of a memory buffer.
+     * \see setInputStream
+     *
+     */
+	PROPERTIES4CXX_PUBLIC
     Properties (std::istream *inputStream);
-    
+
+    /**
+     * The destructor does not care for the inputstream set either by \ref setInputStream or by \ref Properties(std::istream *inputStream)
+     * The owner of the inputStream object must close and release it herself.
+     */
+	PROPERTIES4CXX_PUBLIC
     virtual ~Properties();
 
+    /** \brief Set or reset the configuration file name
+     *
+     * Set or reset the configuration file name.
+     *
+     * Calling this function will reset any previously set input stream set by \ref setInputStream or \ref Properties(std::istream *inputStream)
+     * You can call this function as often as you like. Only the last file name set will be used by \ref readConfiguration.
+     *
+     * This call will reset any inputStream set either by \ref setInputStream or by Properties(std::istream *inputStream)
+     *
+     * @param configFileName Name of the configuration file. Can either be an absolute or relative path. The path
+     * specification must comply with the OS conventions.
+     *
+     */
+	PROPERTIES4CXX_PUBLIC
     void setFileName (char const *configFileName);
+
+    /** \brief Set or reset the configuration file name
+     *
+     * Set or reset the configuration file name.
+     *
+     * Calling this function will reset any previoProperties (std::string const &configFileName)usly set input stream set by \ref setInputStream or \ref Properties(std::istream *inputStream)
+     * You can call this function as often as you like. Only the last file name set will be used by \ref readConfiguration.
+     *
+     * This call will reset any inputStream set either by \ref setInputStream or by Properties(std::istream *inputStream)
+     *
+     * @param configFileName Name of the configuration file. Can either be an absolute or relative path. The path
+     * specification must comply with the OS conventions.
+     *
+     */
+	PROPERTIES4CXX_PUBLIC
     void setFileName (std::string const configFileName);
 
+    /** \brief Set an input stream as source for the property definitions
+     *
+     * Set an input stream as source for the property definitions
+     *
+     * It is the caller's sole responsibility to manage inputStream. Before you call \ref readConfiguration the stream
+     * must be open or an istringstream must be initialized, and the read pointer must be rewound.
+     *
+     * \ref readConfiguration will not close or reset or rewind the stream after reading the stream.
+     *
+     * This call supersedes any input file name which may have been defined before.
+     *
+     * @param inputStream Pointer to an input stream which the call manages herself
+     */
+	PROPERTIES4CXX_PUBLIC
     void setInputStream (std::istream *inputStream);
 
+    /** \brief Read the properties from a file or an input stream
+     *
+     * Read the properties from a file or an input stream
+     *
+     * If the configuration file name was set the file is opened in text mode and used as input.
+     *
+     * If an user input stream was set by \ref setInputStream or by \ref Properties(std::istream *inputStream) it will be
+     * used right away as input for the reader.
+     *
+     * If a configuration file name was set by either \ref setFileName or by
+     * \ref Properties(std::string const &configFileName) or by \ref Properties(std::string const &configFileName)
+     * an ifstream is opened read-only in text mode and used as input for the reader.
+     * After reading the configuration file the ifstream is closed in any case no matter if the configuration was read succesfully
+     * or not.
+     *
+     */
+	PROPERTIES4CXX_PUBLIC
     void readConfiguration();
 
 
