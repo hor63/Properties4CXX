@@ -1,3 +1,22 @@
+2018-03-21  hor  <hor@horUbuntu>
+
+	* src/Makefile.am:
+	  Add /include to the includes search path
+	   
+	* src/Properties.cpp (~Properties): 
+	* include/Properties4CXX/Properties.h (Properties): 
+	(Properties::Properties): 
+	(Properties::~Properties): 
+	(Properties::setFileName): 
+	(Properties::setInputStream): 
+	(Properties::readConfiguration):
+	  Define and document the interface setting the input source and reading the configuration
+	   
+	* src/scanner.ll:
+	  Implement interpretation of escaped characters in quoted strings
+	  Refine reading of float numbers 
+	
+	
 2018-03-20  hor  <hor@horUbuntu>
 
 	* .cproject: New file.
