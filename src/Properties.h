@@ -28,7 +28,49 @@
 
 #include <memory>
 #include <sstream>
+#include <istream>
 #include <map>
+#include <string>
+
+
+/**
+ * Define PROPERTIES4CXX_DLL_IMPORT, PROPERTIES4CXX_DLL_EXPORT, and PROPERTIES4CXX_DLL_LOCAL for Windows and Linux (ELF) ports of gcc and non-gcc compilers
+ *
+ * The macro definitions are highly inspired from the <a href="https://gcc.gnu.org/wiki/Visibility">GCC Wiki: Visibility</a>
+ */
+#if defined _WIN32 || defined __CYGWIN__
+    #ifdef __GNUC__
+      #define PROPERTIES4CXX_DLL_EXPORT __attribute__ ((dllexport))
+      #define PROPERTIES4CXX_DLL_IMPORT __attribute__ ((dllimport))
+    #else
+      #define PROPERTIES4CXX_DLL_EXPORT __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
+      #define PROPERTIES4CXX_DLL_IMPORT __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
+    #endif
+    #ifdef __GNUC__
+    #else
+    #endif
+  #define PROPERTIES4CXX_DLL_LOCAL
+#else
+  #if __GNUC__ >= 4
+    #define PROPERTIES4CXX_DLL_EXPORT __attribute__ ((visibility ("default")))
+    #define PROPERTIES4CXX_DLL_LOCAL  __attribute__ ((visibility ("hidden")))
+  #else
+    #define PROPERTIES4CXX_DLL_EXPORT
+    #define PROPERTIES4CXX_DLL_LOCAL
+  #endif
+  #define PROPERTIES4CXX_DLL_IMPORT
+#endif
+
+#if defined (BUILDING_PROPERTIES4CXX)
+  #define OEV_PUBLIC PROPERTIES4CXX_DLL_EXPORT
+  #define OEV_LOCAL  PROPERTIES4CXX_DLL_LOCAL
+#else /* BUILDING_PROPERTIES4CXX */
+  #define OEV_PUBLIC PROPERTIES4CXX_DLL_IMPORT
+  #define OEV_LOCAL  PROPERTIES4CXX_DLL_LOCAL
+#endif /* BUILDING_PROPERTIES4CXX */
+
+
+
 
 namespace Properties4CXX {
 
@@ -38,6 +80,9 @@ namespace Properties4CXX {
  * <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Properties.html" >Properties</a> class.
  * Enhancements are typed properties (Numeric, boolean), quoted (verbatim) strings, lists of values (strings only, quoted or un-quoted)
  * and structures
+ *
+ * The properties file
+ * ===================
  *
  * Basically a properties file looks like
  *
@@ -69,7 +114,7 @@ namespace Properties4CXX {
  *     # double float values
  *     Property8  = -1234.678
  *     Property9  = -1234.678E-12
- *     Property10 = .2343
+ *     Property10 = .2343e+.2
  *
  *     # Boolean values can be yes, no, true, false, on, off. Case insensitive.
  *     PropTrue1 = True
@@ -103,18 +148,58 @@ namespace Properties4CXX {
  *     # All special characters except blank, tab, ',', '{', '}, and '"' are valid for keys and values
  *     Pro.per<;ty16 = |vls<>@!#$%^&
  *
+ * Properties of the properties file (pun intended)
+ * -------------------
+ *
  * Property keys are case sensitive.
+ *
  * Property keys must be defined only once. Double definitions lead to an exception.
+ *
  * Keys within one structure must be unique within the structure only.
+ *
  * All values can be retrieved as strings, even the typed ones.
+ *
+ * Quoted strings
+ * -------------------
+ *
+ * A quoted string can contain any character (including any UTF-8 character)
+ *
+ * A few selected special characters can be written as escaped characters.
+ * The writing is the same as C/C++.
+ *
+ * - \\"	double quote	byte 0x22 in ASCII encoding
+ * - \\\\	backslash	byte 0x5c in ASCII encoding
+ * - \\f	form feed - new page	byte 0x0c in ASCII encoding
+ * - \\n	line feed - new line	byte 0x0a in ASCII encoding
+ * - \\r	carriage return	byte 0x0d in ASCII encoding
+ * - \\t	horizontal tab	byte 0x09 in ASCII encoding
+ * - \\v	vertical tab	byte 0x0b in ASCII encoding
+ *
+ * Any other escaped character is taken over literally. A sequence "\\x" will become "x". The '\\' character is swallowed.
  *
  */
 class Properties {
 public:
-    Properties () {
-    }
+    Properties ();
+
+    Properties (char const *configFileName);
+
+    Properties (std::string const &configFileName);
+
+    Properties (std::string const &configFileName);
+
+    Properties (std::istream *inputStream);
     
     virtual ~Properties();
+
+    void setFileName (char const *configFileName);
+    void setFileName (std::string const configFileName);
+
+    void setInputStream (std::istream *inputStream);
+
+    void readConfiguration();
+
+
 };
 
 }; // namespace Properties4CXX {
