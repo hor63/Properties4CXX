@@ -50,6 +50,8 @@ extern long  yy_curr_column;
 /* Support fully reentrant parser and scanner */
 %option reentrant bison-bridge
 %option header-file="lexer.h"
+/* When the input stream ends, it ends... */
+%option noyywrap
 
 /* ------------------------------------------------------------------------- */
 /* --  Some useful abbreviations  ----------------------------------------- */
