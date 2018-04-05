@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef PROPERTIES4CXX_H_
-#define PROPERTIES4CXX_H_
+#ifndef INCLUDE_PROPERTIES4CXX_PROPERTies_H_
+#define INCLUDE_PROPERTIES4CXX_PROPERTies_H_
 
 #include <memory>
 #include <sstream>
@@ -32,7 +32,14 @@
 #include <map>
 #include <string>
 
+namespace Properties4CXX {
+class Properties;
+}
 
+#include "Properties4CXX/Property.h"
+
+#if !defined PROPERTIES4CXX_EXPORT
+#define PROPERTIES4CXX_EXPORT
 /**
  * Define PROPERTIES4CXX_DLL_IMPORT, PROPERTIES4CXX_DLL_EXPORT, and PROPERTIES4CXX_DLL_LOCAL for Windows and Linux (ELF) ports of gcc and non-gcc compilers
  *
@@ -69,6 +76,7 @@
   #define PROPERTIES4CXX_LOCAL  PROPERTIES4CXX_DLL_LOCAL
 #endif /* BUILDING_PROPERTIES4CXX */
 
+#endif /* #define PROPERTIES4CXX_EXPORT */
 
 
 
@@ -180,7 +188,7 @@ namespace Properties4CXX {
  * Numeric locale
  * -------------------
  *
- * The locale is always "C", i.e. the decimal speparator is always the dot '.'. Hundred separators are not allowed.
+ * The locale is always "C", i.e. the decimal separator is always the dot '.'. Hundred separators are not allowed.
  *
  * Thus a number in German locale 123,456 is not valid. Neither is a number 123,456.2323 valid input.
  *
@@ -306,4 +314,4 @@ public:
 
 }; // namespace Properties4CXX {
 
-#endif /* #ifndef PROPERTIES4CXX_H_ */
+#endif /* #ifndefINCLUDE_PROPERTIES4CXX_PROPERTies_H_ */

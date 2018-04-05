@@ -19,7 +19,7 @@
 
 lib_LTLIBRARIES=libProperties4CXX.la
 
-libProperties4CXX_la_SOURCES=scanner.ll parser.yy Properties.cpp
+libProperties4CXX_la_SOURCES=scanner.ll parser.yy Properties.cpp Property.cpp
  
 libProperties4CXX_la_LIBADD=$(PTHREAD_LIBS)
 

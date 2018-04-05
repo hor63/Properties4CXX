@@ -1,3 +1,16 @@
+2018-04-05  kai_horstmann  <kai_horstmann@werum1619>
+
+	* include\Properties4CXX\Property.h: New file.
+	* src\Property.cpp: New file.
+	* .cproject: 
+	* .settings\language.settings.xml: 
+	* doxygen.cfg: 
+	* include\Properties4CXX\Properties.h: 
+	* src\Makefile.am: 
+	* src\parser.yy: 
+		Class Property and subclasses done except PropertyStruct which requires the Properties interface to be completed.  
+	
+	
 2018-03-21  hor  <hor@horUbuntu>
 
 	* src/Makefile.am:

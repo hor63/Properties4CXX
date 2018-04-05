@@ -64,7 +64,7 @@ void yyerror (void *scanner, const char* parseMsg);
 %union {
 char*	string;
 double	numVal;
-long	intVal;
+long long	intVal;
 bool    boolVal;
 }
 
