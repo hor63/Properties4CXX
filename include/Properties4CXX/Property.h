@@ -92,19 +92,19 @@ typedef std::list<std::string> PropertyValueList;
 class PROPERTIES4CXX_DLL_EXPORT
 ExceptionWrongPropertyType : public std::exception {
 public:
-	ExceptionWrongPropertyType(char const *descr) _GLIBCXX_USE_NOEXCEPT
+	ExceptionWrongPropertyType(char const *descr) noexcept
 		:description {descr}
 		{ }
-	ExceptionWrongPropertyType(std::string const &descr) _GLIBCXX_USE_NOEXCEPT
+	ExceptionWrongPropertyType(std::string const &descr) noexcept
 		:description {descr}
 		{ }
 
-	virtual ~ExceptionWrongPropertyType() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT;
+	virtual ~ExceptionWrongPropertyType() noexcept;
 
 	/** Returns a C-style character string describing the general cause
 	*  of the current error.  */
 	virtual const char*
-	what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT;
+	what() const noexcept;
 
 private:
 	std::string description;

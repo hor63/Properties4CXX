@@ -35,12 +35,12 @@
 
 namespace Properties4CXX {
 
-ExceptionWrongPropertyType::~ExceptionWrongPropertyType() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT {
+ExceptionWrongPropertyType::~ExceptionWrongPropertyType() noexcept {
 
 }
 
 const char*
-ExceptionWrongPropertyType::what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT {
+ExceptionWrongPropertyType::what() const noexcept {
 	return description.c_str();
 }
 

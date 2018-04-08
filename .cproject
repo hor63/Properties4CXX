@@ -57,16 +57,10 @@
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.toolChain.1607183682;org.eclipse.linuxtools.cdt.autotools.core.toolChain.1607183682.1569665428;cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.1432599220;cdt.managedbuild.tool.gnu.cpp.compiler.input.cygwin.220728490">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.toolChain.1607183682;org.eclipse.linuxtools.cdt.autotools.core.toolChain.1607183682.1569665428;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc.2032490208;cdt.managedbuild.tool.gnu.c.compiler.input.1506452254">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.toolChain.1607183682;org.eclipse.linuxtools.cdt.autotools.core.toolChain.1607183682.1569665428;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp.1641500745;cdt.managedbuild.tool.gnu.cpp.compiler.input.485921243">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.toolChain.1607183682;org.eclipse.linuxtools.cdt.autotools.core.toolChain.1607183682.1569665428;cdt.managedbuild.tool.gnu.c.compiler.cygwin.874166329;cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.1721552306">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 	</storageModule>
