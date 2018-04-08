@@ -312,6 +312,68 @@ public:
 
 };
 
+// A few conversion helpers for the scanner
+
+/** \brief Convert a decimal integer value into a long long.
+ *
+ * The form is guaranteed by the scanner to be:
+ * [+-][1-9][0-9]*, i.e. 1234 or +234 or -20994
+ *
+ * @param str
+ * @return converted value as long long (int)
+ */
+long long strToLL (char const *str);
+
+/** \brief Convert a octal integer value into a long long.
+ *
+ * The form is guaranteed by the scanner to be:
+ * 0[0-7]*, i.e. 0 or 0234. 000345 is also valid
+ *
+ * @param str
+ * @return converted value as long long (int)
+ */
+long long strOctToLL (char const *str);
+
+/** \brief Convert a binary integer value into a long long.
+ *
+ * The form is guaranteed by the scanner to be:
+ * 0[bB][01]+, i.e. 0b101001 or 0B001001101
+ *
+ * @param str
+ * @return converted value as long long (int)
+ */
+long long strBinToLL (char const *str);
+
+/** \brief Convert a hexadecimal integer value into a long long.
+ *
+ * The form is guaranteed by the scanner to be:
+ * 0[xX][0-9a-fA-F]+, i.e. 0x123abc or 0XABDE or 0xAbcDeF .0x0 is also valid
+ *
+ * @param str
+ * @return converted value as long long (int)
+ */
+long long strHexToLL (char const *str);
+
+/** \brief Convert a float number into long double.
+ *
+ * The form is guaranteed by the scanner to be:
+ *
+ * First form of a double: Pure integer with an exponent is a double
+ * Floats like 1e10, 1e-5L, +1e+10, -1e-5
+ *
+ * Second form: Digit sequence with a dot '.'. Exponent optional
+ * Floats like 1., 1.e-2, -1., +1.e-2,  -1.e+2
+ *
+ * Third form: Decimal digits after the dot '.'.
+ * Digits before the dot and the Exponent are optional.
+ * Floats like 3.14, -.1, +0.1e-1
+ *
+ * @param str the numeric string
+ * @return converted value as long double
+ */
+long double strToLD (char const *str);
+
+
 }; // namespace Properties4CXX {
 
 #endif /* #ifndefINCLUDE_PROPERTIES4CXX_PROPERTies_H_ */

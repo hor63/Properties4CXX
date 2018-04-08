@@ -33,8 +33,9 @@
 #include <cstring>
 #include <cstdlib>
 #include <istream>
-#include "parser.hh"
 
+#include "parser.hh"
+#include "Properties4CXX/Properties.h"
 
 static void yy_countlines (char const* text);
 static char *scanQuotedString (char const *quotedText);
@@ -60,7 +61,7 @@ extern long  yy_curr_column;
 hexdig   [0-9a-fA-F]
 decnum   ([1-9][0-9]*)
 hexnum   (0[xX]{hexdig}+)
-exp      ([eE][+-]?([0-9]+("."[0-9]*)?)|("."[0-9]+))
+exp      ([eE][+-]?[0-9]+)
 
 
 /* ---------------------------------------------------------------<string>---------- */
@@ -130,42 +131,56 @@ exp      ([eE][+-]?([0-9]+("."[0-9]*)?)|("."[0-9]+))
 
 
 [+-]?{decnum}                         { /* Simple integer */
-                                        yylval->numVal = strtol((char *)(yytext),NULL,0);
+                                        yylval->intVal = Properties4CXX::strToLL(yytext);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_INTEGER); 
                                       }
 
 
 0[0-7]*                               { /* Octal number (incl. 0) */
-                                        yylval->numVal = strtoul((char *)(yytext),NULL,0);
+                                        yylval->intVal = Properties4CXX::strOctToLL(yytext);
+                                        yy_curr_column += strlen(yytext);
+                                        return (LEX_INTEGER); 
+                                      }
+
+0[bB][01]+                               { /* Binary number */
+                                        yylval->intVal = Properties4CXX::strOctToLL(yytext);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_INTEGER); 
                                       }
 
 
 {hexnum}                              { /* hexadecimal number */
-                                        yylval->numVal = strtoul((char *)(yytext),NULL,0);
+                                        yylval->intVal = Properties4CXX::strHexToLL(yytext);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_INTEGER); 
                                       }
 
 
-[+-]?[0-9]+"."[0-9]*                  { /* floats like -123. or 123.23 */
-                                        yylval->numVal = strtod((char *)(yytext),NULL);
+
+[+-]?[0-9]+{exp}	                  { /* First form of a double: Pure integer with an exponent is a double
+										 * Floats like 1e10, 1e-5L, +1e+10, -1e-5 
+										 */
+                                        yylval->numVal = Properties4CXX::strToLD(yytext);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_DOUBLE); 
                                       }
 
 
-[+-]?[0-9]+("."[0-9]*)?{exp}          { /* floats like -123E12 or 123.23e.2 or +023E-1.1 */
-                                        yylval->numVal = strtod((char *)(yytext),NULL);
+[+-]?[0-9]+"."{exp}?         		 { /* Second form: Digit sequence with a dot '.'. Exponent optional 
+										* floats like -123E12 or 123.23e.2 or +023E-1.1 
+									    */
+                                        yylval->numVal = Properties4CXX::strToLD(yytext);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_DOUBLE); 
                                       }
 
 
-[+-]?"."[0-9]+{exp}?                  { /* floats like -.123 or .23e.2 or +.023E-1.1 */
-                                        yylval->numVal = strtod((char *)(yytext),NULL);
+[+-]?[0-9]*"."[0-9]+{exp}?            { /* Third form: Decimal digits after the dot '.'. 
+										/* Digits before the dot and Exponent are optional. 
+										* floats like 3.14, -.1, +0.1e-1 
+									    */
+                                        yylval->numVal = Properties4CXX::strToLD(yytext);
                                         yy_curr_column += strlen(yytext);
                                         return (LEX_DOUBLE); 
                                       }
