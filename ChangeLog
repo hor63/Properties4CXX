@@ -1,5 +1,13 @@
 2018-04-11  hor  <horstmannkai@hotmail.com>
 
+	* .settings\language.settings.xml: 
+	* configure.ac: 
+	  Set version to 1.0
+
+	* doxygen.cfg: 
+	* README.md:
+	  Improve description in Github, and brief in Doxygen doc
+	 
 	* include\Properties4CXX\Properties.h (ExceptionBase): 
 	* src\Properties.cpp (Properties): 
 	(ExceptionBase::~ExceptionBase): 
@@ -41,7 +49,7 @@
 	(Properties.getCPropertyMap):
 	  Properties interface complete.
 	  Implementation complete except Properties::readConfiguration()
-	 
+
 2018-04-08  hor  <hor@horUbuntu>
 
 	* include/Properties4CXX/Properties.h: 

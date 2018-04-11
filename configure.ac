@@ -18,7 +18,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([Properties4CXX],[0.1],[https://github.com/hor63/Properties4CXX/issues],[Properties4CXX],https://github.com/hor63/Properties4CXX)
+AC_INIT([Properties4CXX],[1.0],[https://github.com/hor63/Properties4CXX/issues],[Properties4CXX],https://github.com/hor63/Properties4CXX)
 AC_CONFIG_HEADERS(config.h)
 
 AC_CONFIG_MACRO_DIRS([m4])
