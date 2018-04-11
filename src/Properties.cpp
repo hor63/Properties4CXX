@@ -33,48 +33,116 @@
 
 namespace Properties4CXX {
 
-PROPERTIES4CXX_PUBLIC
-Properties::Properties () {
+ExceptionBase::~ExceptionBase () {}
+
+const char* ExceptionBase::what() const noexcept {
+	return description.c_str();
+}
+
+ExceptionConfigReadError::~ExceptionConfigReadError () {}
+
+ExceptionConfigFileOpenError::~ExceptionConfigFileOpenError () {}
+
+ExceptionPropertyNotFound::~ExceptionPropertyNotFound () {}
+
+ExceptionPropertyDuplicate::~ExceptionPropertyDuplicate () {}
+
+Properties::Properties ()
+:configFileManagedInternally{false},
+ inputStream{0}
+{ }
+
+Properties::Properties (char const *configFileName)
+:configFileManagedInternally{true},
+ configFileName{configFileName},
+ inputStream{0}
+{ }
+
+Properties::Properties (std::string const &configFileName)
+:configFileManagedInternally{true},
+ configFileName{configFileName},
+ inputStream{0}
+{ }
+
+Properties::Properties (std::istream *iStream)
+:configFileManagedInternally{false},
+ inputStream{inputStream}
+{
+
+	inputStream = iStream;
+	configFileManagedInternally = false;
 
 }
 
-PROPERTIES4CXX_PUBLIC
-Properties::Properties (char const *configFileName) {
-
-}
-
-PROPERTIES4CXX_PUBLIC
-Properties::Properties (std::string const &configFileName) {
-
-}
-
-PROPERTIES4CXX_PUBLIC
-Properties::Properties (std::istream *inputStream) {
-
-}
-
-PROPERTIES4CXX_PUBLIC
 Properties::~Properties() {
 
 }
 
-PROPERTIES4CXX_PUBLIC
-void Properties::setFileName (char const *configFileName) {
+void Properties::setFileName (char const *configName) {
+
+	inputStream = 0;
+	configFileManagedInternally = true;
+	configFileName = configName;
 
 }
 
-PROPERTIES4CXX_PUBLIC
-void Properties::setFileName (std::string const configFileName) {
+void Properties::setFileName (std::string const configName) {
+
+	inputStream = 0;
+	configFileManagedInternally = true;
+	configFileName = configName;
 
 }
 
-PROPERTIES4CXX_PUBLIC
-void Properties::setInputStream (std::istream *inputStream){
+void Properties::setInputStream (std::istream *iStream){
+
+	if (inputFileStream.is_open()) {
+		inputFileStream.close();
+	}
+	inputStream = iStream;
+	configFileManagedInternally = false;
 
 }
 
-PROPERTIES4CXX_PUBLIC
 void Properties::readConfiguration() {
+
+}
+
+Property const *Properties::searchProperty (std::string const &propertyName) const {
+
+	PropertyCIterator it = propertyMap.find(propertyName);
+	if (it == propertyMap.cend()) {
+		std::string errText = "Cannot find property ";
+		errText.append(propertyName);
+		throw ExceptionPropertyNotFound(errText.c_str());
+	}
+
+	return it->second.get();
+
+}
+
+void Properties::insertProperty (Property *newProperty) {
+
+	PropertyCIterator it = propertyMap.find(newProperty->getPropertyName());
+
+	if (it != propertyMap.cend()) {
+		std::string errText = "Property already exists: ";
+		errText.append(newProperty->getPropertyName());
+		throw ExceptionPropertyDuplicate(errText.c_str());
+	}
+
+	propertyMap.insert (PropertyPair(newProperty->getPropertyName(),PropertyPtr(newProperty)));
+
+}
+
+void Properties::deletePropery (std::string const &propertyName) {
+
+	PropertyIterator it = propertyMap.find(propertyName);
+
+	if (it != propertyMap.end()) {
+		// It exists, therefore delete it!
+		propertyMap.erase(it);
+	}
 
 }
 

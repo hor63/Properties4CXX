@@ -1,6 +1,49 @@
+2018-04-11  hor  <horstmannkai@hotmail.com>
+
+	* include\Properties4CXX\Properties.h (ExceptionBase): 
+	* src\Properties.cpp (Properties): 
+	(ExceptionBase::~ExceptionBase): 
+	(ExceptionBase::what): 
+	(ExceptionConfigReadError::~ExceptionConfigReadError): 
+	(ExceptionConfigFileOpenError::~ExceptionConfigFileOpenError): 
+	(ExceptionPropertyNotFound::~ExceptionPropertyNotFound): 
+	(ExceptionPropertyDuplicate::~ExceptionPropertyDuplicate): 
+	(Properties::Properties): 
+	(Properties::~Properties): 
+	(Properties::setFileName): 
+	(~Properties): 
+	(Properties::setInputStream): 
+	(setFileName): 
+	(Properties::readConfiguration): 
+	(Properties::searchProperty): 
+	(setInputStream): 
+	(Properties::insertProperty): 
+	(readConfiguration): 
+	(strToLL): 
+	(Properties::deletePropery): 
+	(ExceptionBase.ExceptionBase): 
+	(ExceptionConfigReadError): 
+	(ExceptionConfigReadError.ExceptionConfigReadError): 
+	(ExceptionConfigFileOpenError): 
+	(ExceptionConfigFileOpenError.ExceptionConfigFileOpenError): 
+	(ExceptionPropertyNotFound): 
+	(ExceptionPropertyNotFound.ExceptionPropertyNotFound): 
+	(ExceptionPropertyDuplicate): 
+	(ExceptionPropertyDuplicate.ExceptionPropertyDuplicate): 
+	(Properties): 
+	(Properties.getConfigFileName): 
+	(Properties.isConfigFileManagedInternally): 
+	(Properties.getFirstProperty): 
+	(Properties.getListEnd): 
+	(Properties.numProperties): 
+	(Properties.getPropertyFromIterator): 
+	(Properties.getPropertyMap): 
+	(Properties.getCPropertyMap):
+	  Properties interface complete.
+	  Implementation complete except Properties::readConfiguration()
+	 
 2018-04-08  hor  <hor@horUbuntu>
 
-	* .settings/language.settings.xml: 
 	* include/Properties4CXX/Properties.h: 
 	* src/parser.yy: 
 	* src/Properties.cpp (strToLL): 

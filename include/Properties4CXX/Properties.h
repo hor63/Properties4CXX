@@ -28,7 +28,7 @@
 
 #include <memory>
 #include <sstream>
-#include <istream>
+#include <fstream>
 #include <map>
 #include <string>
 
@@ -81,6 +81,90 @@ class Properties;
 
 
 namespace Properties4CXX {
+
+/** \brief Base for all exceptions in the namespace Properties4CXX
+ *
+ */
+class PROPERTIES4CXX_PUBLIC
+ExceptionBase : public std::exception {
+public:
+
+	ExceptionBase (char const *descr)
+			:description{descr}
+			{}
+
+	virtual ~ExceptionBase ();
+
+    /** Returns a C-style character string describing the general cause
+     *  of the current error.  */
+    virtual const char*
+    what() const noexcept override;
+
+
+private:
+
+	std::string description;
+};
+
+/** \brief Exception thrown when a read error on the input stream occurs
+ *
+ */
+class PROPERTIES4CXX_PUBLIC
+ ExceptionConfigReadError: public ExceptionBase {
+public:
+
+	ExceptionConfigReadError(char const *descr)
+	  :ExceptionBase{descr}
+			{}
+
+	virtual ~ExceptionConfigReadError ();
+
+};
+
+/** \brief Exception thrown when an internally managed input file stream cannot open the configuration file.
+ *
+ */
+class PROPERTIES4CXX_PUBLIC
+ ExceptionConfigFileOpenError: public ExceptionBase {
+public:
+
+	ExceptionConfigFileOpenError(char const *descr)
+	  :ExceptionBase{descr}
+			{}
+
+	virtual ~ExceptionConfigFileOpenError ();
+
+};
+
+/** \brief An exception cannot be found using \ref Properties::searchProperty()
+ *
+ */
+class PROPERTIES4CXX_PUBLIC
+ ExceptionPropertyNotFound: public ExceptionBase {
+public:
+
+	ExceptionPropertyNotFound(char const *descr)
+	  :ExceptionBase{descr}
+			{}
+
+	virtual ~ExceptionPropertyNotFound ();
+
+};
+
+/** \brief An exception with the same name is inserted twice on one structure level of the confiuration using \ref Properties::insertProperty()
+ *
+ */
+class PROPERTIES4CXX_PUBLIC
+ ExceptionPropertyDuplicate: public ExceptionBase {
+public:
+
+	ExceptionPropertyDuplicate(char const *descr)
+	  :ExceptionBase{descr}
+			{}
+
+	virtual ~ExceptionPropertyDuplicate ();
+
+};
 
 /** \brief Properties reader. Inspired from Java Properties
  *
@@ -194,14 +278,22 @@ namespace Properties4CXX {
  *
  *
  */
-class Properties {
+class PROPERTIES4CXX_PUBLIC
+Properties {
 public:
+
+	// A bunch of useful type definitions to avoid writing the templates again and again.
+	typedef std::shared_ptr<Property> PropertyPtr;
+	typedef std::pair<std::string, PropertyPtr> PropertyPair;
+	typedef std::map<std::string, PropertyPtr> PropertyMap;
+	typedef PropertyMap::const_iterator PropertyCIterator;
+	typedef PropertyMap::iterator PropertyIterator;
+
 
 	/**
 	 * Constructor. Before reading a configuration you must either set the configuration file name,
 	 * or set the input stream
 	 */
-	PROPERTIES4CXX_PUBLIC
     Properties ();
 
     /** \brief Constructor defining the input file name
@@ -212,7 +304,6 @@ public:
      * specification must comply with the OS conventions
      *
      */
-	PROPERTIES4CXX_PUBLIC
     Properties (char const *configFileName);
 
     /** \brief Constructor defining the input file name
@@ -223,7 +314,6 @@ public:
      * specification must comply with the OS conventions.
      *
      */
-	PROPERTIES4CXX_PUBLIC
     Properties (std::string const &configFileName);
 
     /** \brief Constructor defining the input stream
@@ -232,14 +322,12 @@ public:
      * \see setInputStream
      *
      */
-	PROPERTIES4CXX_PUBLIC
     Properties (std::istream *inputStream);
 
     /**
      * The destructor does not care for the inputstream set either by \ref setInputStream or by \ref Properties(std::istream *inputStream)
      * The owner of the inputStream object must close and release it herself.
      */
-	PROPERTIES4CXX_PUBLIC
     virtual ~Properties();
 
     /** \brief Set or reset the configuration file name
@@ -255,7 +343,6 @@ public:
      * specification must comply with the OS conventions.
      *
      */
-	PROPERTIES4CXX_PUBLIC
     void setFileName (char const *configFileName);
 
     /** \brief Set or reset the configuration file name
@@ -271,7 +358,6 @@ public:
      * specification must comply with the OS conventions.
      *
      */
-	PROPERTIES4CXX_PUBLIC
     void setFileName (std::string const configFileName);
 
     /** \brief Set an input stream as source for the property definitions
@@ -287,8 +373,24 @@ public:
      *
      * @param inputStream Pointer to an input stream which the call manages herself
      */
-	PROPERTIES4CXX_PUBLIC
     void setInputStream (std::istream *inputStream);
+
+    std::string const getConfigFileName() const {
+    	return configFileName;
+    }
+
+    /** \brief Is the input stream for the configuration managed internally by setting the configureation file name,
+     *  or is a user provided input stream being used?
+     *
+     *  Returns true when the configuration file name was set either by the constructor or \ref setFileName()
+     *
+     *  Returns false when the parameter less constructor was used, or the external input stream pointer was set either by the constructor
+     *  or by \ref setInputStream()
+     * @return
+     */
+    bool isConfigFileManagedInternally() const {
+    	return configFileManagedInternally;
+    }
 
     /** \brief Read the properties from a file or an input stream
      *
@@ -306,9 +408,140 @@ public:
      * or not.
      *
      */
-	PROPERTIES4CXX_PUBLIC
     void readConfiguration();
 
+    /** \brief Search for a property identified by its name
+     *
+     * @param propertyName Name by which the property is searched.
+     * @return Pointer to the property
+     * @throws \ref ExceptionPropertyNotFound when the exception does not exist.
+     */
+    Property const *searchProperty (std::string const &propertyName) const;
+
+    /** \brief Return the Iterator of the first property
+     *
+     * If there is no property the returned iterator is equal to \ref getListEnd()
+     *
+     * You can traverse through the list using the increment operator ++ until the iterator reaches the end of the list which is identified by
+     * equality to \ref getListEnd()
+     *
+     * @return Iterator to the first property
+     */
+    PropertyCIterator getFirstProperty () const {
+    	return propertyMap.cbegin();
+    }
+
+    /** \brief Return the list end Iterator. This iterator points *past* the actual list.
+     *
+     * The iterator returned here does *not* point to a valid property!
+     * Trying to extract a \ref Property from it will likely lead to segmentation error and crash of the program!
+     *
+     * @return
+     */
+    PropertyCIterator getListEnd () const {
+    	return propertyMap.cend();
+    }
+
+
+    /** \brief Get number of properties on this level of the configuration
+     *
+     * The number of properties is not cumulative, but is retured per structure level of the configuration
+     *
+     * @return Number of properties on this level of the configuration
+     */
+    PropertyMap::size_type numProperties() {
+    	return propertyMap.size();
+    }
+
+    /** \brief Helper to extract the property from an iterator
+     *
+     * *Note* If you call this method for an iterator equal to \ref getListEnd() of the configuration where it came from the result is undefined, and may lead
+     * to unexpected behavior, in the best case immediate crash.
+     *
+     * @param it Iterator to extract the property from
+     * @return Reference to the property associated with the iterator
+     */
+    static inline Property const  &getPropertyFromIterator(PropertyCIterator it) {
+    	return *(it->second.get());
+    }
+
+    /** \brief Insert a new property into this level of the configuration.
+     *
+     * This methods inserts the property passed in newPropery into the container of this. this takes ownership of the propery passed.
+     * It must *not* be deleted by the caller, or it must not be declared as plain object in the code. It *must* be created with the operator new.
+     * The container of this will take care to delete the object when this is deleted or becomes invalid.
+     * Properties must be unique by name on one structure level in the configuration.
+     *
+     * @param newProperty Pointer to property to be inserted. this takes ownership of the property.
+     * @throws \ref ExceptionPropertyDuplicate when another property with the same name already exists in the configuration on this structure level.
+     */
+    void insertProperty (Property *newProperty);
+
+    /** \brief Delete a propery in the current level of the configuration.
+     *
+     * If the property does not exist nothing happens. No exception is thrown.
+     *
+     * The property to be removed is only removed from the current structure level of the configuration.
+     * A property with the name on a lower or higher level will not be affected.
+     *
+     * @param propertyName Name of the property to be deleted from the configuration
+     */
+    void deletePropery (std::string const &propertyName);
+
+    /** \brief Return reference to the internal map of properties \ref Property
+     *
+     * This is a function for insiders to gain direct access to the internal map of properties.
+     * A lot harder to program but gives access to the full functionality of std::map.
+     * Type checking ensures that you cannot really break anything seriously.
+     *
+     * Use it at your own peril.
+     *
+     * @return Reference to the internal std::map \ref PropertyMap containing \ref Property
+     */
+    PropertyMap &getPropertyMap() {
+    	return propertyMap;
+    }
+
+    /** \brief Return reference to the constant internal map of properties \ref Property
+     *
+     * This is a function for insiders to gain direct access to the constant internal map of properties.
+     * A lot harder to program but gives access to the full functionality of std::map.
+     * Returning a reference to a constant ensures that nothing can be modified unless playing diry.
+     *
+     * Use it at your own peril.
+     *
+     * @return Reference to the internal std::map \ref PropertyMap containing \ref Property
+     */
+    PropertyMap const &getCPropertyMap () const {
+    	return propertyMap;
+    }
+
+private:
+
+    /// \brief Name of configuration file. Input stream is handled internally
+	std::string configFileName;
+
+	/// \brief Flag if the input stream is handled internally. The file name is given by \ref configfileName.
+	/// The internal input file stream \ref inputFileStream is used as inut.
+	bool configFileManagedInternally = true;
+
+	/** \brief External input stream. If this pointer is set also configFileManagedInternally is set true
+	 *
+	 * The input stream must be managed by the owner of the pointer including opening it before calling \ref readConfiguration()
+	 * and closing afterwards.
+	 * The stream can also be a stringstream or any other kind of subclass of std::istream.
+	 */
+	std::istream *inputStream = 0;
+
+	/** \brief Internally managed input file stream
+	 *
+	 * It is used when the configuration file name is defined either by the constructor or \ref setFileName
+	 * Then \ref configFileManagedInternally is set true.
+	 */
+	std::ifstream inputFileStream;
+
+	/// \brief std::map containing all properties. Key is std::string containing the property name.
+	PropertyMap propertyMap;
 
 };
 
