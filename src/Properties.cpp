@@ -104,6 +104,15 @@ void Properties::setInputStream (std::istream *iStream){
 
 }
 
+void Properties::setStructLevel (int structLevel) {
+
+	this->structLevel = structLevel;
+
+	for (PropertyIterator it=propertyMap.begin(); it != propertyMap.end(); it++) {
+		it->second.get()->setStructLevel(structLevel);
+	}
+}
+
 void Properties::readConfiguration() {
 
 }

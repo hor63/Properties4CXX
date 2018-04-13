@@ -392,6 +392,28 @@ public:
     	return configFileManagedInternally;
     }
 
+    /** \brief get the structure level of this configuration list
+     *
+     * The base level of the configuration is 0.
+     * A Properties object embedded in a \ref ProperyStruct object is 1.
+     * If this sub-structure contains another \ref ProperyStruct object that level is 2, and so forth.
+     *
+     * The structure level governs the indent of sub-structured in configuration printouts
+     *
+     * @return Structure level
+     */
+    int getStructLevel () const {
+    	return structLevel;
+    }
+
+    /** \brief Set the structure level of this configuration list, and all included properties
+     *
+     * \see getStructLevel for more information about sub-structures and structure levels.
+     *
+     * @param structLevel
+     */
+    void setStructLevel (int structLevel);
+
     /** \brief Read the properties from a file or an input stream
      *
      * Read the properties from a file or an input stream
@@ -517,6 +539,8 @@ public:
     }
 
 private:
+
+    int structLevel = 0;
 
     /// \brief Name of configuration file. Input stream is handled internally
 	std::string configFileName;

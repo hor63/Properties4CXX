@@ -248,13 +248,15 @@ public:
 		return structLevel;
 	}
 
-	/** \brief Set the structure level for a property for print-out indention.
+	/** \brief Set the structure level for a property for \ref writeOut indention.
 	 *
-	 * Resets \ref isStringValueDefined
+	 * In the base class only sets \ref structLevel.
+	 *
+	 * komplex sub-classes need to do more. Therefore virtual
 	 *
 	 * @param structLevel New structure level
 	 */
-	void setStructLevel(int structLevel);
+	virtual void setStructLevel(int structLevel);
 
 	/** \brief Helper for \ref ::std::ostream &operator << (std::ostream &os,const Properties4CXX::Property &property)
 	 *

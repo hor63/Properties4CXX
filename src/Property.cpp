@@ -124,6 +124,10 @@ Properties const& Property::getPropertiesStructure() const {
 	return *ret;
 }
 
+virtual void Property::setStructLevel(int structLevel) {
+	this->structLevel = structLevel;
+}
+
 std::ostream &Property::writeOut (std::ostream &os) const {
 
 	if (structLevel > 0) {
