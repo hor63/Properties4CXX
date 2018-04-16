@@ -337,6 +337,7 @@ void PropertyList::setLazyStringValue() const {
 		it++;
 	}
 
+	isStringValueDefined = true;
 
 }
 

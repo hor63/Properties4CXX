@@ -140,6 +140,7 @@ void Properties::insertProperty (Property *newProperty) {
 		throw ExceptionPropertyDuplicate(errText.c_str());
 	}
 
+	newProperty->setStructLevel(structLevel);
 	propertyMap.insert (PropertyPair(newProperty->getPropertyName(),PropertyPtr(newProperty)));
 
 }
