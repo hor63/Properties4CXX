@@ -137,11 +137,7 @@ std::ostream &Property::writeOut (std::ostream &os) const {
 		os << padString;
 	}
 
-
-	os << propertyName << " = ";
-
-
-	os << std::endl;
+	os << propertyName << " = " << getStringValue() << std::endl;
 
 	return os;
 
@@ -337,6 +333,7 @@ void PropertyList::setLazyStringValue() const {
 		it++;
 	}
 
+	stringValue = newString;
 	isStringValueDefined = true;
 
 }
@@ -344,6 +341,61 @@ void PropertyList::setLazyStringValue() const {
 void PropertyList::appendString (std::string const &str) {
 	valueList.push_back(str);
 	isStringValueDefined = false;
+}
+
+PropertyStruct::PropertyStruct(char const* propertyName, Properties const &propertyList, int structLevel)
+	:Property{propertyName,structLevel},
+	 propertyList{new Properties}
+	{
+
+		 this->propertyList->getPropertyMap() = propertyList.getCPropertyMap();
+		 this->propertyList->setStructLevel(structLevel + 1);
+}
+
+
+PropertyStruct::~PropertyStruct() {
+	delete propertyList;
+}
+
+
+Properties const& PropertyStruct::getPropertiesStructure() const {
+
+	return *propertyList;
+
+}
+
+void PropertyStruct::setStructLevel(int structLevel) {
+
+	Property::setStructLevel(structLevel);
+	propertyList->setStructLevel(structLevel + 1);
+
+}
+
+void PropertyStruct::appendProperty (Property  *prop) {
+
+	propertyList->insertProperty(prop);
+
+}
+
+void PropertyStruct::setLazyStringValue() const {
+	std::ostringstream ostr;
+
+	ostr << '{' << std::endl;
+	propertyList->writeOut(ostr);
+
+	if (structLevel > 0) {
+		std::string padString;
+		padString.append (structLevel,'\t');
+
+		ostr << padString;
+	}
+
+	ostr << '}';
+
+	stringValue = ostr.str();
+	isStringValueDefined = true;
+
+
 }
 
 

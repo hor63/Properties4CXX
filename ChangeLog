@@ -1,3 +1,28 @@
+2018-04-27  hor  <horstmannkai@hotmail.com>
+
+	* .settings/language.settings.xml: 
+	* include/Properties4CXX/Properties.h (Properties): 
+	* include/Properties4CXX/Property.h (PropertyList): 
+	* src/Properties.cpp (strToLL): 
+	* src/Property.cpp (writeOut): 
+	(Property::writeOut): 
+	(setLazyStringValue): 
+	(appendString): 
+	(PropertyList::setLazyStringValue): 
+	(PropertyStruct::PropertyStruct): 
+	(PropertyStruct::~PropertyStruct): 
+	(PropertyStruct::getPropertiesStructure): 
+	(PropertyStruct::setStructLevel): 
+	(PropertyStruct::appendProperty): 
+	(PropertyStruct::setLazyStringValue): 
+	(Properties::writeOut): 
+	(PropertyStruct): 
+	(getCPropertyMap): 
+	(Properties.getCPropertyMap): 
+	(operator <<): 
+	  Add class PropertyStruct
+	  Add output streaming of Properties 
+	
 2018-04-11  hor  <horstmannkai@hotmail.com>
 
 	* .settings\language.settings.xml: 

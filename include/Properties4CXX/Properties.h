@@ -526,17 +526,25 @@ public:
 
     /** \brief Return reference to the constant internal map of properties \ref Property
      *
-     * This is a function for insiders to gain direct access to the constant internal map of properties.
-     * A lot harder to program but gives access to the full functionality of std::map.
-     * Returning a reference to a constant ensures that nothing can be modified unless playing diry.
+     * This is a function for insiders to gain direct access to the internal map of properties.
+     * A lot harder to program but gives access to the full functionality of const std::map.
+     * Type checking ensures that you cannot really break anything seriously.
      *
      * Use it at your own peril.
      *
-     * @return Reference to the internal std::map \ref PropertyMap containing \ref Property
+     * @return Reference to the constant internal std::map \ref PropertyMap containing \ref Property
      */
-    PropertyMap const &getCPropertyMap () const {
+    PropertyMap const &getCPropertyMap() const{
     	return propertyMap;
     }
+
+
+	/** \brief Helper for \ref std::ostream &operator << (std::ostream &os,const Properties4CXX::Properties &properties)
+	 *
+	 * @param os Output stream
+	 * @return Reference to <a href="http://en.cppreference.com/w/cpp/io/basic_ostream" >std::ostream</a>
+	 */
+	std::ostream &writeOut (std::ostream &os) const;
 
 private:
 
@@ -632,5 +640,18 @@ long double strToLD (char const *str);
 
 
 }; // namespace Properties4CXX {
+
+/** \brief Output stream operator for \ref Properties4CXX::Properties objects.
+ *
+ *
+ * @param os Output stream
+ * @param properties \ref Properties to be printed/streamed.
+ * @return Reference to <a href="http://en.cppreference.com/w/cpp/io/basic_ostream" >std::ostream</a>
+ */
+static inline std::ostream &operator << (std::ostream &os,const Properties4CXX::Properties &properties) {
+	properties.writeOut(os);
+
+	return os;
+}
 
 #endif /* #ifndefINCLUDE_PROPERTIES4CXX_PROPERTies_H_ */

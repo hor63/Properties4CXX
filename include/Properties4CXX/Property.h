@@ -510,7 +510,7 @@ protected:
 
 /** \brief Property list class. This is a list of string values under one property name
  *
- * The class content is immutable. Once created it cannot be changed any more.
+ * The list is created with an initial list of values. Additional strings can be added afterwards.
  *
  */
 class PROPERTIES4CXX_DLL_EXPORT
@@ -551,7 +551,7 @@ protected:
 
 	/** \brief Set the string value on demand
 	 *
-	 * in \ref writeOut this method is called when \ref Property::isStringValueDefined is false.
+	 * In \ref writeOut this method is called when \ref Property::isStringValueDefined is false.
 	 *
 	 * The function sets \ref isStringValueDefined true, and calls \ref Property::setStringValueInternal with the current list of string values.
 	 */
@@ -566,6 +566,77 @@ private:
 };
 
 
+/** \brief Property structure class. This list of properties enclosed in curly brackets, combined under one property name
+ *
+ * The structure is created from an initial properties list. Additional properties can be added afterwards.
+ */
+class PROPERTIES4CXX_DLL_EXPORT
+PropertyStruct :public Property {
+public:
+
+	/** \brief Constructor
+	 *
+	 * @param propertyName Name of the property
+	 * @param propertyList List of properties.
+	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
+	 */
+	PropertyStruct(char const* propertyName, Properties const &propertyList, int structLevel = 0);
+
+	/** \brief Destructor
+	 *
+	 * Virtual is a must here because it will be overloaded.
+	 */
+	virtual ~PropertyStruct();
+
+
+	/** \brief Return the list of properties which make up this property.
+	 *
+	 * \see Property::getPropertiesStructure()
+	 * \see Property
+	 *
+	 * @return List of properties
+	 */
+	virtual Properties const& getPropertiesStructure() const;
+
+	/** \brief Set the structure level for a property structure for \ref writeOut indention.
+	 *
+	 * \see Property::setStructLevel
+	 *
+	 * @param structLevel New structure level
+	 */
+	virtual void setStructLevel(int structLevel);
+
+
+	/** \brief Add a property to the property list
+	 *
+	 * @param prop Pointer to a new property. This takes ownership of the property. The caller must never delete the passed \ref prop!
+	 */
+	void appendProperty (Property *prop);
+
+protected:
+
+
+	/** \brief Set the string value on demand
+	 *
+	 * in \ref writeOut this method is called when \ref Property::isStringValueDefined is false.
+	 *
+	 * The function sets \ref isStringValueDefined true, and calls \ref Property::setStringValueInternal with the current list of string values.
+	 */
+	virtual void setLazyStringValue() const override;
+
+
+	// A bit of stuff is quite critical, and needs to be handled within the class. Also derived classes have to access it via the interface
+private:
+
+	/** \brief List of properties in a sub-structure
+	 *
+	 * This is a pointer due to hen&egg problem: Here the declaration of class \ref Properties is incomplete.
+	 */
+	Properties *propertyList = 0;
+
+};
+
+
 } /* namespace Properties4CXX */
 
 /** \brief Output stream operator for \ref Properties4CXX::Property objects.
@@ -574,7 +645,7 @@ private:
  * A property is always terminated by a newline. Therefore this << operator always prints a \ref std::endl.
  *
  * @param os Output stream
- * @param Property Property to be printed/streamed.
+ * @param property \ref Property to be printed/streamed.
  * @return Reference to <a href="http://en.cppreference.com/w/cpp/io/basic_ostream" >std::ostream</a>
  */
 static inline std::ostream &operator << (std::ostream &os,const Properties4CXX::Property &property) {

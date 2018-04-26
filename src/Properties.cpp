@@ -156,6 +156,21 @@ void Properties::deletePropery (std::string const &propertyName) {
 
 }
 
+std::ostream &Properties::writeOut (std::ostream &os) const {
+
+	auto it = propertyMap.cbegin();
+
+	while (it != propertyMap.cend()) {
+		it->second->writeOut(os);
+		it++;
+	}
+
+	os << std::endl;
+
+	return os;
+
+}
+
 long long strToLL (char const *str){
 	long long rc = 0ll;
 	bool negative = false;
