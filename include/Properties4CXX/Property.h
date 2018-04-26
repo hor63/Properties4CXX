@@ -297,20 +297,6 @@ protected:
 	 */
 	Property(char const* propertyName, int structLevel = 0);
 
-	std::string const propertyName;
-
-	/** \brief Newline and carriage return characters are to printed escaped as \\n and \\r. If false they are printed verbatim
-	 *
-	 */
-	bool isNewlineEscaped = true;
-
-	/** \brief Level of nested structures. Used for indent for printout.
-	 *
-	 * Top level is 0
-	 * Used for indent structured print-out with \ref writeOut
-	 */
-	int structLevel = 0;
-
 	/** \brief Helper function to throw an \ref ExceptionWrongPropertyType exception when a not supported property type is requested
 	 *
 	 * @param expectedPropertyTypeName Description/name of the requested return type
@@ -343,10 +329,21 @@ protected:
 	 */
 	virtual std::ostream &writeOutValue (std::ostream &os) const;
 
+	std::string const propertyName;
+
+	/** \brief Newline and carriage return characters are to printed escaped as \\n and \\r. If false they are printed verbatim
+	 *
+	 */
+	bool isNewlineEscaped = true;
+
+	/** \brief Level of nested structures. Used for indent for printout.
+	 *
+	 * Top level is 0
+	 * Used for indent structured print-out with \ref writeOut
+	 */
+	int structLevel = 0;
 
 
-	// A bit of stuff is quite critical, and needs to be handled within the class. Also derived classes have to access it via the interface
-private:
 
 
 	/** \brief Un-quoted string value
@@ -364,6 +361,9 @@ private:
 	 * will be required only when the configuration is being written out.
 	 */
 	mutable bool isStringValueDefined = false;
+
+	// A bit of stuff is quite critical, and needs to be handled within the class. Also derived classes have to access it via the interface
+private:
 
 	/** \brief Determines if the value string was quoted or not.
 	 *
@@ -539,6 +539,12 @@ public:
 	 * @return List of string values of the property
 	 */
 	virtual PropertyValueList const &getPropertyValueList() const override;
+
+	/** \brief Add a string to the list
+	 *
+	 * @param str String to be added to the list
+	 */
+	void appendString (std::string const &str);
 
 protected:
 

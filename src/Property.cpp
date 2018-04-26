@@ -124,7 +124,7 @@ Properties const& Property::getPropertiesStructure() const {
 	return *ret;
 }
 
-virtual void Property::setStructLevel(int structLevel) {
+void Property::setStructLevel(int structLevel) {
 	this->structLevel = structLevel;
 }
 
@@ -341,6 +341,10 @@ void PropertyList::setLazyStringValue() const {
 
 }
 
+void PropertyList::appendString (std::string const &str) {
+	valueList.push_back(str);
+	isStringValueDefined = false;
+}
 
 
 } /* namespace Properties4CXX */
