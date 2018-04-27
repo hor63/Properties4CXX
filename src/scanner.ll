@@ -37,11 +37,8 @@
 #include "parser.hh"
 #include "Properties4CXX/Properties.h"
 
-static void yy_countlines (char const* text);
+static void yy_countlines (char const* text, yyscan_t yyscanner);
 static char *scanQuotedString (char const *quotedText);
-
-extern long  yy_curr_line;
-extern long  yy_curr_column;
 
 
 %}
@@ -74,85 +71,86 @@ exp      ([eE][+-]?[0-9]+)
 
  /* CR-LF according to Windows and DOS custom */
 \r\n    {
-             yy_curr_line++;
-             yy_curr_column = 0;
+             yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
+             yyset_column ( 0,yyscanner);
              
              return LEX_END_OF_LINE;
          }
 
  /* LF-CR reverse to Windows custom. Unusual, but who knows :) */
 \n\r    {
-             yy_curr_line++;
-             yy_curr_column = 0;
+             yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
+             yyset_column ( 0,yyscanner);
              
              return LEX_END_OF_LINE;
          }
 
  /* Single LF as in UNIX, Linux, and text mode I/O channels in C and C++ */
 \n       {
-             yy_curr_line++;
-             yy_curr_column = 0;
+             yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
+             yyset_column ( 0,yyscanner);
              
              return LEX_END_OF_LINE;
          }
 
  /* Single CR like some Windows multi-line edits return */
 \r     {
-             yy_curr_line++;
-             yy_curr_column = 0;
+             yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
+             yyset_column ( 0,yyscanner);
              
              return LEX_END_OF_LINE;
          }
 
 "{"		{
-			yy_curr_column++;
+            yyset_column ( yyget_column(yyscanner) + 1,yyscanner);
 			return LEX_BRACKETOPEN;
 		}
 		 
 "}"		{
-			yy_curr_column++;
+            yyset_column ( yyget_column(yyscanner) + 1,yyscanner);
 			return LEX_BRACKETOPEN;
 		}
 		 
 ","		{
-			yy_curr_column++;
+            yyset_column ( yyget_column(yyscanner) + 1,yyscanner);
 			return LEX_COMMA;
 		}
 		 
 "="		{
-			yy_curr_column++;
+            yyset_column ( yyget_column(yyscanner) + 1,yyscanner);
 			return LEX_ASSIGN;
 		}
 
                                         
 [ \t\xc]    { /* Blank, Tab, Form feed */
-             yy_curr_column += strlen(yytext);
+             yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
+             
             }
 
 
 [+-]?{decnum}                         { /* Simple integer */
                                         yylval->intVal = Properties4CXX::strToLL(yytext);
-                                        yy_curr_column += strlen(yytext);
+                                        yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_INTEGER); 
                                       }
 
 
 0[0-7]*                               { /* Octal number (incl. 0) */
                                         yylval->intVal = Properties4CXX::strOctToLL(yytext);
-                                        yy_curr_column += strlen(yytext);
+                                        yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_INTEGER); 
                                       }
 
 0[bB][01]+                               { /* Binary number */
                                         yylval->intVal = Properties4CXX::strOctToLL(yytext);
-                                        yy_curr_column += strlen(yytext);
+                                        yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_INTEGER); 
                                       }
 
 
 {hexnum}                              { /* hexadecimal number */
                                         yylval->intVal = Properties4CXX::strHexToLL(yytext);
-                                        yy_curr_column += strlen(yytext);
+                                        yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_INTEGER); 
                                       }
 
@@ -162,7 +160,7 @@ exp      ([eE][+-]?[0-9]+)
 										 * Floats like 1e10, 1e-5L, +1e+10, -1e-5 
 										 */
                                         yylval->numVal = Properties4CXX::strToLD(yytext);
-                                        yy_curr_column += strlen(yytext);
+                                        yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_DOUBLE); 
                                       }
 
@@ -171,7 +169,7 @@ exp      ([eE][+-]?[0-9]+)
 										* floats like -123E12 or 123.23e.2 or +023E-1.1 
 									    */
                                         yylval->numVal = Properties4CXX::strToLD(yytext);
-                                        yy_curr_column += strlen(yytext);
+                                        yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_DOUBLE); 
                                       }
 
@@ -181,21 +179,21 @@ exp      ([eE][+-]?[0-9]+)
 										* floats like 3.14, -.1, +0.1e-1 
 									    */
                                         yylval->numVal = Properties4CXX::strToLD(yytext);
-                                        yy_curr_column += strlen(yytext);
+                                        yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_DOUBLE); 
                                       }
 
 
 ([yY][eE][sS])|([tT][rR][uU][eE])|([oO][nN]) { /* yes, true, on case insensitive */
                                         yylval->boolVal = true;
-                                        yy_curr_column += strlen(yytext);
+                                        yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_BOOL); 
                                       }
 
 
 ([nN][oO])|([fF][aA][lL][sS][eE])|([oO][fF][fF]) { /* no, false, off case insensitive */
                                         yylval->boolVal = false;
-                                        yy_curr_column += strlen(yytext);
+                                        yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_BOOL); 
                                       }
 
@@ -208,7 +206,7 @@ exp      ([eE][+-]?[0-9]+)
                                         /* Hack den " am Ende ab. */
                                         yylval->string[strlen(yylval->string) - 1] = '\0';
 
-										yy_countlines (yytext);
+										yy_countlines (yytext,yyscanner);
 
                                         return (LEX_STRING); 
                                        }
@@ -219,7 +217,7 @@ exp      ([eE][+-]?[0-9]+)
 [^\r\n \xc\t\"\{\},=]+	              {
                                         yylval->string = new char[strlen(yytext)+1];
                                         strcpy(yylval->string, yytext);
-                                        yy_curr_column += strlen(yytext);
+                                        yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_IDENTIFIER);
                                        }
 
@@ -230,31 +228,41 @@ exp      ([eE][+-]?[0-9]+)
  /* ------------------------------------------------------------------------- */
 
 
-static void yy_countlines (char const* text)
+static void yy_countlines (char const* text, yyscan_t yyscanner)
 {
 
-   while (*text)
-      {
-      if (*text == '\n')
-         {
-         yy_curr_line ++;
-         yy_curr_column = 0;
-         }
-      else {
-         yy_curr_column ++;
-      }
+   while (*text) {
+      if (*text == '\n') {
+         yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
+         yyset_column ( 0,yyscanner);
+         // \n\r is one newline
+         if (*(text+1) == '\r') {
+            text++;
+         } // if (*(text+1) == '\r') {
+      } else { // if (*text == '\n') {
+	      if (*text == '\r') {
+	         yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
+	         yyset_column ( 0,yyscanner);
+	         // \r\n is one newline
+	         if (*(text+1) == '\n') {
+	            text++;
+	         } // if (*(text+1) == '\n') {
+	      } else { // else if (*text == '\r') {
+	           yyset_column ( yyget_column(yyscanner) + 1,yyscanner);
+	      }
+	   } // else if (*text == '\n') {
       text ++;
-      }
+   } // while
    
 }
 
 static char *scanQuotedString (char const *quotedText) {
 char* outString = new char[strlen(quotedText)];
-int i, k=0;
+int k=0;
 char c;
    
-    // Run through the string from the 1st character, i.e. leave the initial double-quote out
-	for (i=1; *quotedText != '"'; i++) {
+    // Run through the string from the 2nd character, i.e. leave the initial double-quote out
+	for (quotedText++; *quotedText != '"'; quotedText ++) {
 		if (*quotedText == '\\') {
 		  // Here is a masked character
 		  quotedText++;
@@ -291,11 +299,11 @@ char c;
 		} else {
 		  // copy the character
 		  outString[k] = *quotedText;
-		  k++;
 		}
 		
-	    quotedText ++;
+		k++;
+	    
 	} 
 
-
+	outString[k] = '\0';
 }
