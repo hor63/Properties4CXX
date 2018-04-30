@@ -1,5 +1,5 @@
-#    This file is part of Properties4CXX, an electronic variometer for glider planes
-#    Copyright (C) 2016  Kai Horstmann
+#    This file is part of Properties4CXX, a Java-inspired properties reader
+#    Copyright (C) 2018  Kai Horstmann
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,13 +15,18 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+SUBDIRS=../src
 
-SUBDIRS=src test
+bin_PROGRAMS = testProperties$(EXEEXT)
+testProperties_SOURCES = PropertiesTest.cpp
 
-MOSTLYCLEANFILES= $(DX_CLEANFILES)
+testProperties_LDFLAGS = $(AM_LDFLAGS) -L../src
 
-ACLOCAL_AMFLAGS= -I m4 
-        
+testProperties_LDADD = -lProperties4CXX \
+	$(LOG4CXX_LIBS) \
+	$(PTHREAD_LIBS)
 
-@DX_RULES@
+AM_LDFLAGS = $(LOG4CXX_LDFLAGS)
 
+AM_CXXFLAGS = -I$(top_srcdir)/include \
+	$(PTHREAD_CFLAGS)

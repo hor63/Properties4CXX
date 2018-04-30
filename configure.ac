@@ -64,7 +64,8 @@ DX_PS_FEATURE(OFF)
 DX_INIT_DOXYGEN(Properties4CXX, $(srcdir)/doxygen.cfg, doc/doxygen)
 
 AC_CONFIG_FILES(Makefile
-                src/Makefile)
+                src/Makefile
+                test/Makefile)
 
 AC_OUTPUT
 
