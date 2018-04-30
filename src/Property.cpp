@@ -295,6 +295,12 @@ PropertyList::PropertyList(char const* propertyName, PropertyValueList const &va
 
 }
 
+PropertyList::PropertyList(char const* propertyName, int structLevel)
+	:Property{propertyName,structLevel}
+{
+
+}
+
 /** \brief Destructor
  * Virtual is a must here because it will be overloaded.
  */
@@ -343,13 +349,19 @@ void PropertyList::appendString (std::string const &str) {
 	isStringValueDefined = false;
 }
 
+PropertyStruct::PropertyStruct(char const* propertyName, int structLevel)
+	:Property{propertyName,structLevel},
+	 propertyList{new Properties}
+{
+	this->propertyList->setStructLevel(structLevel + 1);
+}
+
 PropertyStruct::PropertyStruct(char const* propertyName, Properties const &propertyList, int structLevel)
 	:Property{propertyName,structLevel},
 	 propertyList{new Properties}
-	{
-
-		 this->propertyList->getPropertyMap() = propertyList.getCPropertyMap();
-		 this->propertyList->setStructLevel(structLevel + 1);
+{
+	this->propertyList->getPropertyMap() = propertyList.getCPropertyMap();
+	this->propertyList->setStructLevel(structLevel + 1);
 }
 
 
@@ -371,9 +383,9 @@ void PropertyStruct::setStructLevel(int structLevel) {
 
 }
 
-void PropertyStruct::appendProperty (Property  *prop) {
+void PropertyStruct::addProperty (Property  *prop) {
 
-	propertyList->insertProperty(prop);
+	propertyList->addProperty(prop);
 
 }
 

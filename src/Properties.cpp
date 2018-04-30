@@ -28,7 +28,12 @@
 #endif
 
 
+#include "parserTypes.h"
 #include "Properties4CXX/Properties.h"
+#include "Properties4CXX/Property.h"
+
+#include "parser.hh"
+#include "lexer.h"
 
 
 namespace Properties4CXX {
@@ -115,6 +120,42 @@ void Properties::setStructLevel (int structLevel) {
 
 void Properties::readConfiguration() {
 
+	// the Flex scanner context
+	void *scanner = 0;
+
+	if (configFileManagedInternally) {
+		inputFileStream.exceptions(inputFileStream.badbit );
+
+		if (!inputFileStream.is_open()) {
+			try {
+				inputFileStream.open(configFileName.c_str(),inputFileStream.in);
+				if (inputFileStream.fail()) {
+				std::string errStr ("Cannot open configuration file \"");
+				errStr.append(configFileName).append("\".");
+				throw ExceptionConfigFileOpenError(errStr.c_str());
+				}
+			} catch (std::istream::failure const &e) {
+				throw ExceptionConfigFileOpenError(e.what());
+			}
+		}
+	} else {
+		if (!inputStream) {
+			throw ExceptionConfigReadError ("The external input stream is NULL.");
+		} else {
+			if (!inputStream->bad()) {
+				throw ExceptionConfigReadError ("The external input stream in BAD state.");
+			}
+		}
+	}
+
+	yylex_init_extra(this,&scanner);
+	yyparse(scanner,this);
+
+	if (configFileManagedInternally && inputFileStream.is_open()) {
+		inputFileStream.close();
+	}
+
+
 }
 
 Property const *Properties::searchProperty (std::string const &propertyName) const {
@@ -130,7 +171,7 @@ Property const *Properties::searchProperty (std::string const &propertyName) con
 
 }
 
-void Properties::insertProperty (Property *newProperty) {
+void Properties::addProperty (Property *newProperty) {
 
 	PropertyCIterator it = propertyMap.find(newProperty->getPropertyName());
 
@@ -170,6 +211,27 @@ std::ostream &Properties::writeOut (std::ostream &os) const {
 	return os;
 
 }
+
+int Properties::readConfigIntoBuffer (char* buf, size_t max_size) {
+int bytesRead = 0;
+std::istream & lIStream = configFileManagedInternally?inputFileStream:*inputStream;
+
+	lIStream.exceptions(lIStream.badbit);
+
+	try {
+		if (lIStream.read(buf,max_size)) {
+			bytesRead = lIStream.gcount();
+		} else {
+			bytesRead = 0;
+		}
+	} catch (std::istream::failure const & e) {
+		throw ExceptionConfigReadError(e.what());
+	}
+
+	return bytesRead;
+
+}
+
 
 long long strToLL (char const *str){
 	long long rc = 0ll;
@@ -305,7 +367,7 @@ long double strToLD (char const *str){
 		}
 
 		if (expNegative)  {
-			expFactor = 1.0f / expFactor;
+			expFactor = 1.0l / expFactor;
 		}
 
 		rc *= expFactor;

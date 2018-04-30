@@ -519,6 +519,19 @@ public:
 
 	/** \brief Constructor
 	 *
+	 * This constructor creates an empty list. Value list items must be added with \ref appendString().
+	 *
+	 * @param propertyName Name of the property
+	 * @param valueList List of string values assigned to the property
+	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
+	 */
+	PropertyList(char const* propertyName, int structLevel = 0);
+
+	/** \brief Constructor
+	 *
+	 * This constructor creates a value list with a pre-populated list of string values.
+	 * You can append additional string values with \ref appendString().
+	 *
 	 * @param propertyName Name of the property
 	 * @param valueList List of string values assigned to the property
 	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
@@ -576,6 +589,19 @@ public:
 
 	/** \brief Constructor
 	 *
+	 * This constructor creates an empty property list.
+	 * Properties must be added to the list with \ref appendProperty()
+	 *
+	 * @param propertyName Name of the property
+	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
+	 */
+	PropertyStruct(char const* propertyName, int structLevel = 0);
+
+	/** \brief Constructor
+	 *
+	 * This constructor creates a property list with a pre-populated list of properties.
+	 * Additional properties can be added to the list with \ref appendProperty()
+	 *
 	 * @param propertyName Name of the property
 	 * @param propertyList List of properties.
 	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
@@ -611,7 +637,7 @@ public:
 	 *
 	 * @param prop Pointer to a new property. This takes ownership of the property. The caller must never delete the passed \ref prop!
 	 */
-	void appendProperty (Property *prop);
+	void addProperty (Property *prop);
 
 protected:
 

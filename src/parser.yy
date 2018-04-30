@@ -34,17 +34,18 @@
 #include <sstream>
 #include <string>
 
+#include "parserTypes.h"
+#include "Properties4CXX/Properties.h"
+#include "Properties4CXX/Property.h"
+
 #include "parser.hh"
 #include "lexer.h"
 
-long  yy_curr_line   = 1;
-long  yy_curr_column = 0;
 
-
-/**********************************************************/
+/***********************/
 /* Function prototypes */
 
-void yyerror (void *scanner, const char* parseMsg);
+void yyerror (void *scanner, Properties4CXX::Properties *props, const char* parseMsg);
 
 
 %}
@@ -57,19 +58,27 @@ void yyerror (void *scanner, const char* parseMsg);
 
 %define api.pure full
 %lex-param {void *scanner}
-%parse-param {void *scanner}
+%parse-param {void *scanner} {Properties4CXX::Properties *props}
 
-%start properties
+%start topLevelProperties
 
 %union {
-char*	string;
-long double	numVal;
-long long	intVal;
-bool    boolVal;
+tStrVal		*string;
+tNumVal		*numVal;
+tIntVal		*intVal;
+tBoolVal	*boolVal;
+Properties4CXX::Property	*property;
+Properties4CXX::Properties	*properties;
+Properties4CXX::PropertyValueList *propertyValueList;
 }
 
-%destructor { delete $$; } <string>
-%destructor { } <*>
+%destructor { delete $$->str;     delete $$;	} <string>
+%destructor { delete $$->numStr;  delete $$;	} <numVal>
+%destructor { delete $$->intStr;  delete $$;	} <intVal>
+%destructor { delete $$->boolStr; delete $$;	} <boolVal>
+%destructor { delete $$; 						} <property>
+%destructor { delete $$; 						} <properties>
+%destructor { delete $$; 						} <propertyValueList>
 
 %token <string>           LEX_IDENTIFIER
 %token <string>           LEX_STRING
@@ -88,72 +97,117 @@ bool    boolVal;
 
 
 /* The types of the the rules return */
-%type <string>		stringVal
-%type <string>		property
-%type <string>		simpleProperty
-%type <numVal>		numProperty
-%type <intVal>		intProperty
-%type <intVal>		boolProperty
-
+%type <properties>			properties
+%type <property>			singleProperty
+%type <property>			stringProperty
+%type <property>			numProperty
+%type <property>			intProperty
+%type <property>			boolProperty
+%type <property>			propertyList
+%type <property>			propertyStruct
+%type <propertyValueList>	propertyListList
+%type <string>				stringVal
 
 %%
 /* ------------------------------------------------------------------------- */
 /* --  The rule section  --------------------------------------------------- */
 /* ------------------------------------------------------------------------- */
 
-singleProperty : errorProperty | simpleProperty | numProperty | intProperty | boolProperty | propertyList | propertyStruct
-	;
+topLevelProperties : properties { 
+	props->getPropertyMap() = $1->getPropertyMap();
+	delete $1; 
+	} 
 
-properties : emptyLine | singleProperty 
-	| properties emptyLine
-	| properties singleProperty
+properties : emptyLine { $$ = new Properties4CXX::Properties; } 
+    | singleProperty 
+    { $$ = new Properties4CXX::Properties;
+      if ($1) { // Error property returns NULL pointer
+      	$$->addProperty($1);
+      } }
+	| properties emptyLine { $$ = $1; }
+	| properties singleProperty 
+	{ $$ = $1; 
+	  if ($2) { // Error property returns NULL pointer
+	    $$->addProperty($2); 
+	  } }
 	;
 
 emptyLine : LEX_END_OF_LINE
 	;
- 
+
+singleProperty : 
+	  errorProperty { $$ = 0; /* Pseudo property to continue parsing */ }  
+	| stringProperty	{ $$ = $1; } 
+	| numProperty		{ $$ = $1; } 
+	| intProperty		{ $$ = $1; }
+	| boolProperty		{ $$ = $1; }
+	| propertyList		{ $$ = $1; }
+	| propertyStruct	{ $$ = $1; }
+	;
+
+errorProperty :  error 	 LEX_END_OF_LINE
+	;
+
+stringProperty : LEX_IDENTIFIER LEX_ASSIGN stringVal LEX_END_OF_LINE
+	{ $$ = new Properties4CXX::Property ( $1->str,$3->str,$3->isQuotedString);
+	  delete $1->str; delete $1; $1 = 0; delete $3->str; delete $3; $3 = 0; }
+	;
+
+numProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_DOUBLE LEX_END_OF_LINE
+	{ $$ = new Properties4CXX::PropertyDouble ( $1->str,$3->numStr,$3->numVal); 
+	  delete $1->str; delete $1; $1 = 0; delete $3->numStr; delete $3; $3 = 0; }
+	;
+
+intProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_INTEGER LEX_END_OF_LINE
+	{ $$ = new Properties4CXX::PropertyInt ( $1->str,$3->intStr,$3->intVal);  
+	  delete $1->str; delete $1; $1 = 0; delete $3->intStr; delete $3; $3 = 0; }
+	;
+
+boolProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_BOOL LEX_END_OF_LINE
+	{ $$ = new Properties4CXX::PropertyBool ( $1->str,$3->boolStr,$3->boolVal);   
+	  delete $1->str; delete $1; $1 = 0; delete $3->boolStr; delete $3; $3 = 0; }
+	;
+
+propertyList : LEX_IDENTIFIER LEX_ASSIGN propertyListList LEX_END_OF_LINE
+	{ $$ = new Properties4CXX::PropertyList ($1->str,*$3);
+	  delete $1->str; delete $1; $1 = 0; delete $3; $3 = 0; }
+		
+propertyStruct : LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN properties LEX_BRACKETCLOSE LEX_END_OF_LINE
+	{ $$ = new Properties4CXX::PropertyStruct ($1->str,*$4);
+	  delete $1->str; delete $1; $1 = 0; delete $4; $4 = 0; }
+	| LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN error LEX_BRACKETCLOSE  LEX_END_OF_LINE
+	{ $$ = 0; // erroneous structure
+	  delete $1->str; delete $1; $1 = 0;
+	}
+	| LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN properties
+	{
+	    $$ = new Properties4CXX::PropertyStruct ($1->str,*$4);
+	 	delete $1->str; delete $1; $1 = 0; delete $4; $4 = 0; 
+		yyerror (scanner, props, "Found opening '{' without closing '}'");
+		YYERROR;
+	}
+	;
+
 stringVal : LEX_IDENTIFIER | LEX_STRING
 		{ $$ = $1; }
 	;
  
-errorProperty :  error 	 LEX_END_OF_LINE
-	;
-
-simpleProperty : property LEX_END_OF_LINE 
-		{ $$ = $1; }
-	;
-
-propertyList : propertyListList LEX_END_OF_LINE;
-		
-propertyListList : property LEX_COMMA stringVal
-	| propertyListList LEX_COMMA stringVal
-	;
-		
-property : LEX_IDENTIFIER LEX_ASSIGN stringVal LEX_END_OF_LINE
-		{ $$ = $3; }
-	;
-
-numProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_DOUBLE LEX_END_OF_LINE
-		{ $$ = $3; }
-	;
-
-intProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_INTEGER LEX_END_OF_LINE
-		{ $$ = $3; }
-	;
-
-boolProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_BOOL LEX_END_OF_LINE
-		{ $$ = $3; }
-	;
-
-propertyStruct : LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN propertyList LEX_BRACKETCLOSE
-
-	| LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN error LEX_BRACKETCLOSE
-	| LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN propertyList
-		{
-		  yyerror (scanner, "Found opening '{' without closing '}'");
-		  YYERROR;
+propertyListList : 
+	stringVal LEX_COMMA stringVal { 
+		$$ = new Properties4CXX::PropertyValueList;
+		$$->push_back($1->str);
+		delete $1->str; delete $1; $1 = 0;
+		$$->push_back($3->str);
+		delete $3->str; delete $3; $3 = 0;
+		}
+	| propertyListList LEX_COMMA stringVal {
+		$$ = $1;
+		$$->push_back($3->str);
+		delete $3->str; delete $3; $3 = 0;
 		}
 	;
+		
+
 	
 %%
 /* ------------------------------------------------------------------------- */
@@ -163,11 +217,11 @@ propertyStruct : LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN propertyList LEX_BRAC
 
 using namespace std;
 
-void yyerror (void *scanner, const char* parseMsg)
+void yyerror (yyscan_t scanner, Properties4CXX::Properties *props, const char* parseMsg)
 {
 
-  cerr << "Parse error in line " << yy_curr_line
-    << " in column " << yy_curr_column << " is \"" << parseMsg << "\"" << endl;
+  cerr << "Parse error in line " << yyget_lineno(scanner)
+    << " in column " << yyget_column(scanner) << " is \"" << parseMsg << "\"" << endl;
 
 }
 

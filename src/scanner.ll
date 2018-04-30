@@ -34,11 +34,26 @@
 #include <cstdlib>
 #include <istream>
 
-#include "parser.hh"
+#include "parserTypes.h"
 #include "Properties4CXX/Properties.h"
+#include "Properties4CXX/Property.h"
+
+
+#include "parser.hh"
 
 static void yy_countlines (char const* text, yyscan_t yyscanner);
 static char *scanQuotedString (char const *quotedText);
+
+// Overwrite the input macro to read from the configuration input stream.
+#if defined YY_INPUT
+#undef YY_INPUT
+#endif /* if defined YY_INPUT */
+#define YY_INPUT(buf,result,max_size) { \
+	result = yyget_extra(yyscanner)->readConfigIntoBuffer (buf, max_size); \
+	} \
+
+
+
 
 
 %}
@@ -50,6 +65,8 @@ static char *scanQuotedString (char const *quotedText);
 %option header-file="lexer.h"
 /* When the input stream ends, it ends... */
 %option noyywrap
+
+%option extra-type="Properties4CXX::Properties *"
 
 /* ------------------------------------------------------------------------- */
 /* --  Some useful abbreviations  ----------------------------------------- */
@@ -129,27 +146,39 @@ exp      ([eE][+-]?[0-9]+)
 
 
 [+-]?{decnum}                         { /* Simple integer */
-                                        yylval->intVal = Properties4CXX::strToLL(yytext);
+                                        yylval->intVal = new tIntVal;
+                                        yylval->intVal->intVal = Properties4CXX::strToLL(yytext);
+                                        yylval->intVal->intStr = new char[strlen (yytext) + 1];
+                                        strcpy(yylval->intVal->intStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_INTEGER); 
                                       }
 
 
 0[0-7]*                               { /* Octal number (incl. 0) */
-                                        yylval->intVal = Properties4CXX::strOctToLL(yytext);
+                                        yylval->intVal = new tIntVal;
+                                        yylval->intVal->intVal = Properties4CXX::strOctToLL(yytext);
+                                        yylval->intVal->intStr = new char[strlen (yytext) + 1];
+                                        strcpy(yylval->intVal->intStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_INTEGER); 
                                       }
 
 0[bB][01]+                               { /* Binary number */
-                                        yylval->intVal = Properties4CXX::strOctToLL(yytext);
+                                        yylval->intVal = new tIntVal;
+                                        yylval->intVal->intVal = Properties4CXX::strOctToLL(yytext);
+                                        yylval->intVal->intStr = new char[strlen (yytext) + 1];
+                                        strcpy(yylval->intVal->intStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_INTEGER); 
                                       }
 
 
 {hexnum}                              { /* hexadecimal number */
-                                        yylval->intVal = Properties4CXX::strHexToLL(yytext);
+                                        yylval->intVal = new tIntVal;
+                                        yylval->intVal->intVal = Properties4CXX::strHexToLL(yytext);
+                                        yylval->intVal->intStr = new char[strlen (yytext) + 1];
+                                        strcpy(yylval->intVal->intStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_INTEGER); 
                                       }
@@ -159,7 +188,10 @@ exp      ([eE][+-]?[0-9]+)
 [+-]?[0-9]+{exp}	                  { /* First form of a double: Pure integer with an exponent is a double
 										 * Floats like 1e10, 1e-5L, +1e+10, -1e-5 
 										 */
-                                        yylval->numVal = Properties4CXX::strToLD(yytext);
+                                        yylval->numVal = new tNumVal;
+                                        yylval->numVal->numVal = Properties4CXX::strToLD(yytext);
+                                        yylval->numVal->numStr = new char[strlen (yytext) + 1];
+                                        strcpy(yylval->numVal->numStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_DOUBLE); 
                                       }
@@ -168,7 +200,10 @@ exp      ([eE][+-]?[0-9]+)
 [+-]?[0-9]+"."{exp}?         		 { /* Second form: Digit sequence with a dot '.'. Exponent optional 
 										* floats like -123E12 or 123.23e.2 or +023E-1.1 
 									    */
-                                        yylval->numVal = Properties4CXX::strToLD(yytext);
+                                        yylval->numVal = new tNumVal;
+                                        yylval->numVal->numVal = Properties4CXX::strToLD(yytext);
+                                        yylval->numVal->numStr = new char[strlen (yytext) + 1];
+                                        strcpy(yylval->numVal->numStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_DOUBLE); 
                                       }
@@ -178,34 +213,39 @@ exp      ([eE][+-]?[0-9]+)
 										/* Digits before the dot and Exponent are optional. 
 										* floats like 3.14, -.1, +0.1e-1 
 									    */
-                                        yylval->numVal = Properties4CXX::strToLD(yytext);
+                                        yylval->numVal = new tNumVal;
+                                        yylval->numVal->numVal = Properties4CXX::strToLD(yytext);
+                                        yylval->numVal->numStr = new char[strlen (yytext) + 1];
+                                        strcpy(yylval->numVal->numStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_DOUBLE); 
                                       }
 
 
 ([yY][eE][sS])|([tT][rR][uU][eE])|([oO][nN]) { /* yes, true, on case insensitive */
-                                        yylval->boolVal = true;
+                                        yylval->boolVal = new tBoolVal;
+                                        yylval->boolVal->boolVal = true;
+                                        yylval->boolVal->boolStr = new char[strlen (yytext) + 1];
+                                        strcpy(yylval->numVal->numStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_BOOL); 
                                       }
 
 
 ([nN][oO])|([fF][aA][lL][sS][eE])|([oO][fF][fF]) { /* no, false, off case insensitive */
-                                        yylval->boolVal = false;
+                                        yylval->boolVal = new tBoolVal;
+                                        yylval->boolVal->boolVal = false;
+                                        yylval->boolVal->boolStr = new char[strlen (yytext) + 1];
+                                        strcpy(yylval->numVal->numStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_BOOL); 
                                       }
 
 
-
 \"([^\"]|(\\\"))*\"                    { /* A quoted string */
-                                        yylval->string = new char[strlen(yytext) + 1];
-                                        strcpy(yylval->string, yytext+1);
-
-                                        /* Hack den " am Ende ab. */
-                                        yylval->string[strlen(yylval->string) - 1] = '\0';
-
+                                        yylval->string = new tStrVal;
+                                        yylval->string->str = scanQuotedString(yytext);
+                                        yylval->string->isQuotedString = true;
 										yy_countlines (yytext,yyscanner);
 
                                         return (LEX_STRING); 
@@ -215,8 +255,10 @@ exp      ([eE][+-]?[0-9]+)
 
 
 [^\r\n \xc\t\"\{\},=]+	              {
-                                        yylval->string = new char[strlen(yytext)+1];
-                                        strcpy(yylval->string, yytext);
+                                        yylval->string = new tStrVal;
+                                        yylval->string->str = new char[strlen(yytext)+1];
+                                        strcpy(yylval->string->str, yytext);
+                                        yylval->string->isQuotedString = false;
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_IDENTIFIER);
                                        }
@@ -306,4 +348,6 @@ char c;
 	} 
 
 	outString[k] = '\0';
+	
+	return outString;
 }

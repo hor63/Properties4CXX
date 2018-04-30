@@ -497,7 +497,7 @@ public:
      * @param newProperty Pointer to property to be inserted. this takes ownership of the property.
      * @throws \ref ExceptionPropertyDuplicate when another property with the same name already exists in the configuration on this structure level.
      */
-    void insertProperty (Property *newProperty);
+    void addProperty (Property *newProperty);
 
     /** \brief Delete a propery in the current level of the configuration.
      *
@@ -545,6 +545,18 @@ public:
 	 * @return Reference to <a href="http://en.cppreference.com/w/cpp/io/basic_ostream" >std::ostream</a>
 	 */
 	std::ostream &writeOut (std::ostream &os) const;
+
+	/** \brief Function to fill the scanner buffer from the configuration input stream
+	 *
+	 * This function is for the use of the internal scanner only.
+	 * It is invoked within the Flex scanner macro YY_INPUT.
+	 *
+	 * @param buf String buffer
+	 * @param max_size Maximum space in the buffer
+	 * @return Number of characters read. 0 means the end of the stream is reached.
+	 */
+	int readConfigIntoBuffer (char* buf, size_t max_size);
+
 
 private:
 
