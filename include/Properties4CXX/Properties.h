@@ -383,6 +383,7 @@ public:
      *  or is a user provided input stream being used?
      *
      *  Returns true when the configuration file name was set either by the constructor or \ref setFileName()
+     *			" prop23 = \" item1 \" , item2,\" Item\t3\nand a newline \"\n"
      *
      *  Returns false when the parameter less constructor was used, or the external input stream pointer was set either by the constructor
      *  or by \ref setInputStream()

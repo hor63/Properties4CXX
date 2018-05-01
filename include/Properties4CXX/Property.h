@@ -294,22 +294,22 @@ public:
 	 */
 	void streamEscapedString (std::ostream &os, std::string const &str) const;
 
-	bool isString () {
+	bool isString () const {
 		return propertyType == String;
 	}
-	bool isDouble () {
+	bool isDouble () const {
 		return propertyType == Double;
 	}
-	bool isInteger () {
+	bool isInteger () const {
 		return propertyType == Integer;
 	}
-	bool isBool () {
+	bool isBool () const {
 		return propertyType == Bool;
 	}
-	bool isList () {
+	bool isList () const {
 		return propertyType == List;
 	}
-	bool isStruct () {
+	bool isStruct () const {
 		return propertyType == Struct;
 	}
 

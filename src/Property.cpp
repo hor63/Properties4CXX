@@ -355,6 +355,7 @@ PropertyStruct::PropertyStruct(char const* propertyName, Properties const &prope
 	:Property{propertyName,structLevel},
 	 propertyList{new Properties}
 {
+	propertyType = Struct;
 	this->propertyList->getPropertyMap() = propertyList.getCPropertyMap();
 	this->propertyList->setStructLevel(structLevel + 1);
 }

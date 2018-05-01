@@ -171,7 +171,7 @@ exp      ([eE][+-]?[0-9]+)
 
 0[bB][01]+                               { /* Binary number */
                                         yylval->intVal = new tIntVal;
-                                        yylval->intVal->intVal = Properties4CXX::strOctToLL(yytext);
+                                        yylval->intVal->intVal = Properties4CXX::strBinToLL(yytext);
                                         yylval->intVal->intStr = new char[strlen (yytext) + 1];
                                         strcpy(yylval->intVal->intStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);

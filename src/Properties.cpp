@@ -120,6 +120,9 @@ void Properties::setStructLevel (int structLevel) {
 
 void Properties::readConfiguration() {
 
+	// Clear the properties list
+	propertyMap.clear();
+
 	// the Flex scanner context
 	void *scanner = 0;
 
