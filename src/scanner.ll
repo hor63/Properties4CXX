@@ -68,6 +68,9 @@ static char *scanQuotedString (char const *quotedText);
 
 %option extra-type="Properties4CXX::Properties *"
 
+/* %option debug */
+%option verbose
+
 /* ------------------------------------------------------------------------- */
 /* --  Some useful abbreviations  ----------------------------------------- */
 /* ------------------------------------------------------------------------- */
@@ -85,33 +88,35 @@ exp      ([eE][+-]?[0-9]+)
 
 
 
+"#"[^\n\r]* { /* Line comments are swallowed by the scanner */
+			  yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
+			}
 
- /* CR-LF according to Windows and DOS custom */
-\r\n    {
+\r\n    {  /* CR-LF according to Windows and DOS custom */
              yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
              yyset_column ( 0,yyscanner);
              
              return LEX_END_OF_LINE;
          }
 
- /* LF-CR reverse to Windows custom. Unusual, but who knows :) */
-\n\r    {
+
+\n\r    { /* LF-CR reverse to Windows custom. Unusual, but who knows :) */
              yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
              yyset_column ( 0,yyscanner);
              
              return LEX_END_OF_LINE;
          }
 
- /* Single LF as in UNIX, Linux, and text mode I/O channels in C and C++ */
-\n       {
+ 
+\n       { /* Single LF as in UNIX, Linux, and text mode I/O channels in C and C++ */
              yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
              yyset_column ( 0,yyscanner);
              
              return LEX_END_OF_LINE;
          }
 
- /* Single CR like some Windows multi-line edits return */
-\r     {
+ 
+\r     { /* Single CR like some Windows multi-line edits return */
              yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
              yyset_column ( 0,yyscanner);
              
@@ -125,7 +130,7 @@ exp      ([eE][+-]?[0-9]+)
 		 
 "}"		{
             yyset_column ( yyget_column(yyscanner) + 1,yyscanner);
-			return LEX_BRACKETOPEN;
+			return LEX_BRACKETCLOSE;
 		}
 		 
 ","		{
@@ -139,7 +144,7 @@ exp      ([eE][+-]?[0-9]+)
 		}
 
                                         
-[ \t\xc]    { /* Blank, Tab, Form feed */
+[ \t\xc]    { /* Blank, Tab, Form feed are swallowed in the scanner */
              yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
              
             }
@@ -226,7 +231,7 @@ exp      ([eE][+-]?[0-9]+)
                                         yylval->boolVal = new tBoolVal;
                                         yylval->boolVal->boolVal = true;
                                         yylval->boolVal->boolStr = new char[strlen (yytext) + 1];
-                                        strcpy(yylval->numVal->numStr ,yytext);
+                                        strcpy(yylval->boolVal->boolStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_BOOL); 
                                       }
@@ -236,7 +241,7 @@ exp      ([eE][+-]?[0-9]+)
                                         yylval->boolVal = new tBoolVal;
                                         yylval->boolVal->boolVal = false;
                                         yylval->boolVal->boolStr = new char[strlen (yytext) + 1];
-                                        strcpy(yylval->numVal->numStr ,yytext);
+                                        strcpy(yylval->boolVal->boolStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_BOOL); 
                                       }

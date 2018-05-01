@@ -137,7 +137,9 @@ std::ostream &Property::writeOut (std::ostream &os) const {
 		os << padString;
 	}
 
-	os << propertyName << " = " << getStringValue() << std::endl;
+	os << propertyName << " = ";
+	writeOutValue(os);
+	os << std::endl;
 
 	return os;
 

@@ -149,6 +149,12 @@ void Properties::readConfiguration() {
 	}
 
 	yylex_init_extra(this,&scanner);
+	YY_BUFFER_STATE buf =  yy_create_buffer ( 0, YY_BUF_SIZE ,scanner);
+	yy_flush_buffer(buf,scanner);
+	yy_switch_to_buffer(buf,scanner);
+
+	// yydebug = 1;
+
 	yyparse(scanner,this);
 
 	if (configFileManagedInternally && inputFileStream.is_open()) {
@@ -219,11 +225,8 @@ std::istream & lIStream = configFileManagedInternally?inputFileStream:*inputStre
 	lIStream.exceptions(lIStream.badbit);
 
 	try {
-		if (lIStream.read(buf,max_size)) {
-			bytesRead = lIStream.gcount();
-		} else {
-			bytesRead = 0;
-		}
+		lIStream.read(buf,max_size);
+		bytesRead = lIStream.gcount();
 	} catch (std::istream::failure const & e) {
 		throw ExceptionConfigReadError(e.what());
 	}
@@ -331,6 +334,7 @@ long double strToLD (char const *str){
 
 	while (*str >= '0' && *str <= '9') {
 		rc = rc * 10.0l + (long double)(*str - '0');
+		str++;
 	}
 
 	// now the decimals
@@ -344,11 +348,14 @@ long double strToLD (char const *str){
 			// Dividing by the accumulated factor once minimizes the inaccuracy.
 			fractFactor *= 10.0l;
 			rc += (long double)(*str - '0') / fractFactor;
+			str++;
 		}
 	}
 
 	// Now the exponent
 	if (*str == 'e' || *str == 'E') {
+		str++;
+
 		if (*str == '-') {
 			expNegative = true;
 			str++;
@@ -359,6 +366,7 @@ long double strToLD (char const *str){
 		}
 		while (*str >= '0' && *str <= '9') {
 			exp = exp * 10 + (*str - '0');
+			str++;
 		}
 
 		// Calculate the exp factor by calculating the power of 10 brute force :)

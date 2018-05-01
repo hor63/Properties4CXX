@@ -46,6 +46,12 @@ int main(int argc,char**argv) {
 
 	props.readConfiguration();
 
+	std::ofstream outStream;
+	outStream.open("xx.properties",outStream.out);
+	props.writeOut(outStream);
+	outStream.close();
+
+
 }
 
 

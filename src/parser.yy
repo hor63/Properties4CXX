@@ -56,6 +56,10 @@ void yyerror (void *scanner, Properties4CXX::Properties *props, const char* pars
 
 %define parse.error verbose
 
+%define parse.trace
+%verbose
+
+
 %define api.pure full
 %lex-param {void *scanner}
 %parse-param {void *scanner} {Properties4CXX::Properties *props}
