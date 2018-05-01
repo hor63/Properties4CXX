@@ -119,6 +119,15 @@ class PROPERTIES4CXX_DLL_EXPORT
 Property {
 public:
 
+	enum PropertyTypeEnum {
+		String,
+		Double,
+		Integer,
+		Bool,
+		List,
+		Struct
+	};
+
 	/** \brief Constructor
 	 *
 	 * @param propertyName Name of the property
@@ -285,6 +294,26 @@ public:
 	 */
 	void streamEscapedString (std::ostream &os, std::string const &str) const;
 
+	bool isString () {
+		return propertyType == String;
+	}
+	bool isDouble () {
+		return propertyType == Double;
+	}
+	bool isInteger () {
+		return propertyType == Integer;
+	}
+	bool isBool () {
+		return propertyType == Bool;
+	}
+	bool isList () {
+		return propertyType == List;
+	}
+	bool isStruct () {
+		return propertyType == Struct;
+	}
+
+
 
 protected:
 
@@ -361,6 +390,8 @@ protected:
 	 * will be required only when the configuration is being written out.
 	 */
 	mutable bool isStringValueDefined = false;
+
+	PropertyTypeEnum propertyType = String;
 
 	// A bit of stuff is quite critical, and needs to be handled within the class. Also derived classes have to access it via the interface
 private:

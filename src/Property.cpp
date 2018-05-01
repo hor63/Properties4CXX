@@ -52,7 +52,8 @@ Property::Property(char const* propertyName, char* const propertyValue,bool stri
 	stringValue {propertyValue},
 	isStringValueDefined {true},
 	isStringQuoted{stringIsQuoted},
-	structLevel{structLevel}
+	structLevel{structLevel},
+	propertyType{String}
 	{ }
 
 Property::Property(char const* propertyName, int structLevel)
@@ -234,8 +235,9 @@ void Property::streamEscapedString (std::ostream &os, std::string const &str) co
 
 PropertyDouble::PropertyDouble(char const* propertyName, char* const propertyValue,double propertyValueDbl, int structLevel)
 	:Property(propertyName,propertyValue,/*stringIsQuoted*/false,structLevel),
-	 doubleValue{propertyValueDbl} {
-
+	 doubleValue{propertyValueDbl}
+	 {
+		 propertyType = Double;
 	 }
 
 PropertyDouble::~PropertyDouble() {
@@ -254,8 +256,9 @@ double PropertyDouble::getDoubleValue() const {
 
 PropertyInt::PropertyInt(char const* propertyName, char* const propertyValue,long long propertyValueInt, int structLevel)
 	:Property(propertyName,propertyValue,/*stringIsQuoted*/false,structLevel),
-	 intValue{propertyValueInt} {
-
+	 intValue{propertyValueInt}
+	 {
+		 propertyType = Integer;
 	 }
 
 PropertyInt::~PropertyInt() {
@@ -274,8 +277,9 @@ double PropertyInt::getDoubleValue() const {
 
 PropertyBool::PropertyBool(char const* propertyName, char* const propertyValue,bool propertyValueBool, int structLevel)
 	:Property(propertyName,propertyValue,/*stringIsQuoted*/false,structLevel),
-	 boolValue{propertyValueBool} {
-
+	 boolValue{propertyValueBool}
+	 {
+		 propertyType = Bool;
 	 }
 
 PropertyBool::~PropertyBool() {
@@ -292,7 +296,7 @@ PropertyList::PropertyList(char const* propertyName, PropertyValueList const &va
 	:Property{propertyName,structLevel},
 	 valueList{valueList}
 {
-
+	propertyType = List;
 }
 
 PropertyList::PropertyList(char const* propertyName, int structLevel)
@@ -301,21 +305,11 @@ PropertyList::PropertyList(char const* propertyName, int structLevel)
 
 }
 
-/** \brief Destructor
- * Virtual is a must here because it will be overloaded.
- */
 PropertyList::~PropertyList() {
 
 }
 
 
-/** \brief Returns the list of strings of the property
- *
- * \see Property::getPropertyValueList
- * \see PropertyValueList
- *
- * @return List of string values of the property
- */
 PropertyValueList const &PropertyList::getPropertyValueList() const {
 	return valueList;
 }
@@ -353,6 +347,7 @@ PropertyStruct::PropertyStruct(char const* propertyName, int structLevel)
 	:Property{propertyName,structLevel},
 	 propertyList{new Properties}
 {
+	propertyType = Struct;
 	this->propertyList->setStructLevel(structLevel + 1);
 }
 
