@@ -156,14 +156,12 @@ std::ostream &Property::writeOutValue (std::ostream &os) const {
 
 		os.put('"');
 
-	}
-
-	streamEscapedString (os,stringValue);
-
-	if (isStringQuoted){
+		streamEscapedString (os,stringValue);
 
 		os.put('"');
 
+	} else {
+		os << stringValue;
 	}
 
 	return os;
@@ -324,24 +322,24 @@ PropertyValueList const &PropertyList::getPropertyValueList() const {
 
 
 void PropertyList::setLazyStringValue() const {
-	std::string newString;
+	std::ostringstream newString;
 	auto it = valueList.cbegin();
 
 	if (it != valueList.cend()) {
-		newString = '"';
-		newString.append(*it);
-		newString.append(1,'"');
+		newString.put('"');
+		streamEscapedString(newString, *it);
+		newString.put('"');
 		it++;
 	}
 
 	while (it != valueList.cend()) {
-		newString.append(" , \"");
-		newString.append(*it);
-		newString.append(1,'"');
+		newString << " , \"";
+		streamEscapedString(newString, *it);
+		newString.put('"');
 		it++;
 	}
 
-	stringValue = newString;
+	stringValue = newString.str();
 	isStringValueDefined = true;
 
 }
