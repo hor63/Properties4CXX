@@ -1,5 +1,5 @@
-#    This file is part of Properties4CXX, an electronic variometer for glider planes
-#    Copyright (C) 2016  Kai Horstmann
+#    This file is part of Properties4CXX, a Java-inspired properties reader
+#    Copyright (C) 2018  Kai Horstmann
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -65,7 +65,8 @@ DX_INIT_DOXYGEN(Properties4CXX, $(srcdir)/doxygen.cfg, doc/doxygen)
 
 AC_CONFIG_FILES(Makefile
                 src/Makefile
-                test/Makefile)
+                test/Makefile
+		include/Makefile)
 
 AC_OUTPUT
 

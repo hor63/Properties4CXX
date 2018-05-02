@@ -17,7 +17,7 @@
 
 SUBDIRS=../src
 
-bin_PROGRAMS = testProperties$(EXEEXT)
+noinst_PROGRAMS = testProperties$(EXEEXT)
 testProperties_SOURCES = PropertiesTest.cpp
 
 testProperties_LDFLAGS = $(AM_LDFLAGS) -L../src
