@@ -104,7 +104,7 @@ public:
 	/** Returns a C-style character string describing the general cause
 	*  of the current error.  */
 	virtual const char*
-	what() const noexcept;
+	what() const noexcept override;
 
 private:
 	std::string description;
@@ -261,7 +261,7 @@ public:
 	 *
 	 * In the base class only sets \ref structLevel.
 	 *
-	 * komplex sub-classes need to do more. Therefore virtual
+	 * Complex sub-classes need to do more. Therefore virtual
 	 *
 	 * @param structLevel New structure level
 	 */
@@ -653,7 +653,7 @@ public:
 	 *
 	 * @return List of properties
 	 */
-	virtual Properties const& getPropertiesStructure() const;
+	virtual Properties const& getPropertiesStructure() const override;
 
 	/** \brief Set the structure level for a property structure for \ref writeOut indention.
 	 *
@@ -661,7 +661,7 @@ public:
 	 *
 	 * @param structLevel New structure level
 	 */
-	virtual void setStructLevel(int structLevel);
+	virtual void setStructLevel(int structLevel) override;
 
 
 	/** \brief Add a property to the property list
