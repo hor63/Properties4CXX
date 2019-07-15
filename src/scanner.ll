@@ -59,7 +59,7 @@ static char *scanQuotedString (char const *quotedText);
 %}
 
 /* Important to support UTF-8 */
-%option 8bit 
+%option 8bit
 /* Support fully reentrant parser and scanner */
 %option reentrant bison-bridge
 %option header-file="lexer.h"
@@ -95,7 +95,7 @@ exp      ([eE][+-]?[0-9]+)
 \r\n    {  /* CR-LF according to Windows and DOS custom */
              yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
              yyset_column ( 0,yyscanner);
-             
+
              return LEX_END_OF_LINE;
          }
 
@@ -103,23 +103,23 @@ exp      ([eE][+-]?[0-9]+)
 \n\r    { /* LF-CR reverse to Windows custom. Unusual, but who knows :) */
              yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
              yyset_column ( 0,yyscanner);
-             
+
              return LEX_END_OF_LINE;
          }
 
- 
+
 \n       { /* Single LF as in UNIX, Linux, and text mode I/O channels in C and C++ */
              yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
              yyset_column ( 0,yyscanner);
-             
+
              return LEX_END_OF_LINE;
          }
 
- 
+
 \r     { /* Single CR like some Windows multi-line edits return */
              yyset_lineno(yyget_lineno(yyscanner)+1,yyscanner);
              yyset_column ( 0,yyscanner);
-             
+
              return LEX_END_OF_LINE;
          }
 
@@ -127,26 +127,26 @@ exp      ([eE][+-]?[0-9]+)
             yyset_column ( yyget_column(yyscanner) + 1,yyscanner);
 			return LEX_BRACKETOPEN;
 		}
-		 
+
 "}"		{
             yyset_column ( yyget_column(yyscanner) + 1,yyscanner);
 			return LEX_BRACKETCLOSE;
 		}
-		 
+
 ","		{
             yyset_column ( yyget_column(yyscanner) + 1,yyscanner);
 			return LEX_COMMA;
 		}
-		 
+
 "="		{
             yyset_column ( yyget_column(yyscanner) + 1,yyscanner);
 			return LEX_ASSIGN;
 		}
 
-                                        
+
 [ \t\xc]    { /* Blank, Tab, Form feed are swallowed in the scanner */
              yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
-             
+
             }
 
 
@@ -156,7 +156,7 @@ exp      ([eE][+-]?[0-9]+)
                                         yylval->intVal->intStr = new char[strlen (yytext) + 1];
                                         strcpy(yylval->intVal->intStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
-                                        return (LEX_INTEGER); 
+                                        return (LEX_INTEGER);
                                       }
 
 
@@ -166,7 +166,7 @@ exp      ([eE][+-]?[0-9]+)
                                         yylval->intVal->intStr = new char[strlen (yytext) + 1];
                                         strcpy(yylval->intVal->intStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
-                                        return (LEX_INTEGER); 
+                                        return (LEX_INTEGER);
                                       }
 
 0[bB][01]+                               { /* Binary number */
@@ -175,7 +175,7 @@ exp      ([eE][+-]?[0-9]+)
                                         yylval->intVal->intStr = new char[strlen (yytext) + 1];
                                         strcpy(yylval->intVal->intStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
-                                        return (LEX_INTEGER); 
+                                        return (LEX_INTEGER);
                                       }
 
 
@@ -185,45 +185,45 @@ exp      ([eE][+-]?[0-9]+)
                                         yylval->intVal->intStr = new char[strlen (yytext) + 1];
                                         strcpy(yylval->intVal->intStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
-                                        return (LEX_INTEGER); 
+                                        return (LEX_INTEGER);
                                       }
 
 
 
 [+-]?[0-9]+{exp}	                  { /* First form of a double: Pure integer with an exponent is a double
-										 * Floats like 1e10, 1e-5L, +1e+10, -1e-5 
+										 * Floats like 1e10, 1e-5L, +1e+10, -1e-5
 										 */
                                         yylval->numVal = new tNumVal;
                                         yylval->numVal->numVal = Properties4CXX::strToLD(yytext);
                                         yylval->numVal->numStr = new char[strlen (yytext) + 1];
                                         strcpy(yylval->numVal->numStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
-                                        return (LEX_DOUBLE); 
+                                        return (LEX_DOUBLE);
                                       }
 
 
-[+-]?[0-9]+"."{exp}?         		 { /* Second form: Digit sequence with a dot '.'. Exponent optional 
-										* floats like -123E12 or 123.23e.2 or +023E-1.1 
+[+-]?[0-9]+"."{exp}?         		 { /* Second form: Digit sequence with a dot '.'. Exponent optional
+										* floats like -123E12 or 123.23e.2 or +023E-1.1
 									    */
                                         yylval->numVal = new tNumVal;
                                         yylval->numVal->numVal = Properties4CXX::strToLD(yytext);
                                         yylval->numVal->numStr = new char[strlen (yytext) + 1];
                                         strcpy(yylval->numVal->numStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
-                                        return (LEX_DOUBLE); 
+                                        return (LEX_DOUBLE);
                                       }
 
 
-[+-]?[0-9]*"."[0-9]+{exp}?            { /* Third form: Decimal digits after the dot '.'. 
-										/* Digits before the dot and Exponent are optional. 
-										* floats like 3.14, -.1, +0.1e-1 
+[+-]?[0-9]*"."[0-9]+{exp}?            { /* Third form: Decimal digits after the dot '.'.
+										 * Digits before the dot and Exponent are optional.
+										 * floats like 3.14, -.1, +0.1e-1
 									    */
                                         yylval->numVal = new tNumVal;
                                         yylval->numVal->numVal = Properties4CXX::strToLD(yytext);
                                         yylval->numVal->numStr = new char[strlen (yytext) + 1];
                                         strcpy(yylval->numVal->numStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
-                                        return (LEX_DOUBLE); 
+                                        return (LEX_DOUBLE);
                                       }
 
 
@@ -233,7 +233,7 @@ exp      ([eE][+-]?[0-9]+)
                                         yylval->boolVal->boolStr = new char[strlen (yytext) + 1];
                                         strcpy(yylval->boolVal->boolStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
-                                        return (LEX_BOOL); 
+                                        return (LEX_BOOL);
                                       }
 
 
@@ -243,7 +243,7 @@ exp      ([eE][+-]?[0-9]+)
                                         yylval->boolVal->boolStr = new char[strlen (yytext) + 1];
                                         strcpy(yylval->boolVal->boolStr ,yytext);
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
-                                        return (LEX_BOOL); 
+                                        return (LEX_BOOL);
                                       }
 
 
@@ -253,7 +253,7 @@ exp      ([eE][+-]?[0-9]+)
                                         yylval->string->isQuotedString = true;
 										yy_countlines (yytext,yyscanner);
 
-                                        return (LEX_STRING); 
+                                        return (LEX_STRING);
                                        }
 
 
@@ -268,7 +268,7 @@ exp      ([eE][+-]?[0-9]+)
                                         return (LEX_IDENTIFIER);
                                        }
 
-									   
+
 %%
  /* ------------------------------------------------------------------------- */
  /* --  The function section  ----------------------------------------------- */
@@ -300,21 +300,21 @@ static void yy_countlines (char const* text, yyscan_t yyscanner)
 	   } // else if (*text == '\n') {
       text ++;
    } // while
-   
+
 }
 
 static char *scanQuotedString (char const *quotedText) {
 char* outString = new char[strlen(quotedText)];
 int k=0;
 char c;
-   
+
     // Run through the string from the 2nd character, i.e. leave the initial double-quote out
 	for (quotedText++; *quotedText != '"'; quotedText ++) {
 		if (*quotedText == '\\') {
 		  // Here is a masked character
 		  quotedText++;
 		  switch (*quotedText) {
-		  
+
 		  case '"' :
 		  	 c = '"';
 		  	 break;
@@ -337,22 +337,22 @@ char c;
 		  	 c = '\v';
 		  	 break;
 
-		  default:		   
-			 c = *quotedText;		  
-		  } 
-		  
+		  default:
+			 c = *quotedText;
+		  }
+
 		  outString[k] = c;
-		  
+
 		} else {
 		  // copy the character
 		  outString[k] = *quotedText;
 		}
-		
+
 		k++;
-	    
-	} 
+
+	}
 
 	outString[k] = '\0';
-	
+
 	return outString;
 }
