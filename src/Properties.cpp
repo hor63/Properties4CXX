@@ -71,13 +71,8 @@ Properties::Properties (std::string const &configFileName)
 
 Properties::Properties (std::istream *iStream)
 :configFileManagedInternally{false},
- inputStream{inputStream}
-{
-
-	inputStream = iStream;
-	configFileManagedInternally = false;
-
-}
+ inputStream{iStream}
+{ }
 
 Properties::~Properties() {
 
