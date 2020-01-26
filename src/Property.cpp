@@ -81,6 +81,10 @@ std::string const &Property::getStringValue() const {
 
 char const *Property::getStrValue() const {
 
+	if (!isStringValueDefined) {
+		setLazyStringValue();
+	}
+
 	return stringValue.c_str();
 
 }
