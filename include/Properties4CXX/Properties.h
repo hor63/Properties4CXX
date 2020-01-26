@@ -465,6 +465,61 @@ public:
     	return propertyMap.cend();
     }
 
+    // Some convenience functions to quickly access property values in one level with default values when not found
+
+    /** \brief Search for a boolean property and return the value, else return default value
+     *
+     * Searches the property level for a property named \ref propertyName. If the property exists
+     * return the boolean value of the property.
+     * If the property is not boolean the function throws \ref ExceptionWrongPropertyType
+     *
+     * @param propertyName
+     * @param defaultVal
+     * @return
+	 * @throws ExceptionWrongPropertyType
+     */
+    bool getPropertyValue(std::string const& propertyName, bool defaultVal = false) const;
+
+    /** \brief Search for a double float property and return the value, else return default value
+     *
+     * Searches the property level for a property named \ref propertyName. If the property exists
+     * return the double float value of the property.
+     * If the property is not double the function throws \ref ExceptionWrongPropertyType
+     *
+     * @param propertyName
+     * @param defaultVal
+     * @return
+	 * @throws ExceptionWrongPropertyType
+     */
+    double getPropertyValue(std::string const& propertyName,double defaultVal = 0.0) const;
+
+    /** \brief Search for a long long integer property and return the value, else return default value
+     *
+     * Searches the property level for a property named \ref propertyName. If the property exists
+     * return the long long integer value of the property.
+     * If the property is not long long integer the function throws \ref ExceptionWrongPropertyType
+     *
+     * @param propertyName
+     * @param defaultVal
+     * @return
+	 * @throws ExceptionWrongPropertyType
+     */
+    long long getPropertyValue(std::string const& propertyName,long long defaultVal = 0L) const;
+
+
+    /** \brief Search for a string property and return the value, else return the default value
+     *
+     * Searches the property level for a property named \ref propertyName. If the property exists
+     * return the string value of the property.
+     * The function returns the string value of scalar properties in a level regardless of type.
+     * Only when the property is a structure the function throws \ref ExceptionWrongPropertyType
+     *
+     * @param propertyName
+     * @param defaultVal
+     * @return
+	 * @throws ExceptionWrongPropertyType
+     */
+    char const * getPropertyValue(std::string const& propertyName,char const * defaultVal = nullptr) const;
 
     /** \brief Get number of properties on this level of the configuration
      *

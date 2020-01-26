@@ -175,6 +175,63 @@ Property const *Properties::searchProperty (std::string const &propertyName) con
 
 }
 
+bool Properties::getPropertyValue(std::string const& propertyName, bool defaultVal) const {
+
+	try {
+		Property const * prop = searchProperty(propertyName);
+
+		return prop->getBoolValue();
+
+	} catch (ExceptionPropertyNotFound const &e) {
+		return defaultVal;
+	}
+}
+
+double Properties::getPropertyValue(std::string const& propertyName,double defaultVal) const {
+
+	try {
+		Property const * prop = searchProperty(propertyName);
+
+		return prop->getDoubleValue();
+
+	} catch (ExceptionPropertyNotFound const &e) {
+		return defaultVal;
+	}
+}
+
+long long Properties::getPropertyValue(std::string const& propertyName,long long defaultVal) const {
+
+	try {
+		Property const * prop = searchProperty(propertyName);
+
+		return prop->getIntVal();
+
+	} catch (ExceptionPropertyNotFound const &e) {
+		return defaultVal;
+	}
+}
+
+
+char const * Properties::getPropertyValue(std::string const& propertyName,char const * defaultVal) const {
+
+	try {
+		Property const * prop = searchProperty(propertyName);
+
+		if (prop->isStruct()) {
+			std::ostringstream strstr;
+			strstr << "Property " << propertyName << " is not a scalar value but a struct.";
+
+			throw ExceptionWrongPropertyType(strstr.str());
+		}
+
+		return prop->getStrValue();
+
+	} catch (ExceptionPropertyNotFound const &e) {
+		return defaultVal;
+	}
+
+}
+
 void Properties::addProperty (Property *newProperty) {
 
 	PropertyCIterator it = propertyMap.find(newProperty->getPropertyName());
