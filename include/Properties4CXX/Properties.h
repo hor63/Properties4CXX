@@ -151,7 +151,7 @@ public:
 
 };
 
-/** \brief An exception with the same name is inserted twice on one structure level of the confiuration using \ref Properties::insertProperty()
+/** \brief An exception with the same name is inserted twice on one structure level of the configuration using \ref Properties::addProperty()
  *
  */
 class PROPERTIES4CXX_PUBLIC
@@ -379,10 +379,11 @@ public:
     	return configFileName;
     }
 
-    /** \brief Is the input stream for the configuration managed internally by setting the configureation file name,
+    /** \brief Is the input stream for the configuration managed internally by setting the configuration file name,
      *  or is a user provided input stream being used?
      *
      *  Returns true when the configuration file name was set either by the constructor or \ref setFileName()
+     *
      *			" prop23 = \" item1 \" , item2,\" Item\t3\nand a newline \"\n"
      *
      *  Returns false when the parameter less constructor was used, or the external input stream pointer was set either by the constructor
@@ -396,8 +397,8 @@ public:
     /** \brief get the structure level of this configuration list
      *
      * The base level of the configuration is 0.
-     * A Properties object embedded in a \ref ProperyStruct object is 1.
-     * If this sub-structure contains another \ref ProperyStruct object that level is 2, and so forth.
+     * A \ref Properties object embedded in the base \ref Properties object is 1.
+     * If this sub-structure contains another \ref Properties object that level is 2, and so forth.
      *
      * The structure level governs the indent of sub-structured in configuration printouts
      *
@@ -469,7 +470,7 @@ public:
 
     /** \brief Search for a boolean property and return the value, else return default value
      *
-     * Searches the property level for a property named \ref propertyName. If the property exists
+     * Searches the property level for a property named \p propertyName. If the property exists
      * return the boolean value of the property.
      * If the property is not boolean the function throws \ref ExceptionWrongPropertyType
      *
@@ -482,7 +483,7 @@ public:
 
     /** \brief Search for a double float property and return the value, else return default value
      *
-     * Searches the property level for a property named \ref propertyName. If the property exists
+     * Searches the property level for a property named \p propertyName. If the property exists
      * return the double float value of the property.
      * If the property is not double the function throws \ref ExceptionWrongPropertyType
      *
@@ -495,7 +496,7 @@ public:
 
     /** \brief Search for a long long integer property and return the value, else return default value
      *
-     * Searches the property level for a property named \ref propertyName. If the property exists
+     * Searches the property level for a property named \p propertyName. If the property exists
      * return the long long integer value of the property.
      * If the property is not long long integer the function throws \ref ExceptionWrongPropertyType
      *
@@ -509,7 +510,7 @@ public:
 
     /** \brief Search for a string property and return the value, else return the default value
      *
-     * Searches the property level for a property named \ref propertyName. If the property exists
+     * Searches the property level for a property named \p propertyName. If the property exists
      * return the string value of the property.
      * The function returns the string value of scalar properties in a level regardless of type.
      * Only when the property is a structure the function throws \ref ExceptionWrongPropertyType
@@ -551,7 +552,7 @@ public:
      * Properties must be unique by name on one structure level in the configuration.
      *
      * @param newProperty Pointer to property to be inserted. this takes ownership of the property.
-     * @throws \ref ExceptionPropertyDuplicate when another property with the same name already exists in the configuration on this structure level.
+     * @throws ExceptionPropertyDuplicate when another property with the same name already exists in the configuration on this structure level.
      */
     void addProperty (Property *newProperty);
 
@@ -595,7 +596,7 @@ public:
     }
 
 
-	/** \brief Helper for \ref std::ostream &operator << (std::ostream &os,const Properties4CXX::Properties &properties)
+	/** \brief Helper for std::ostream &operator << (std::ostream &os,const Properties4CXX::Properties &properties)
 	 *
 	 * @param os Output stream
 	 * @return Reference to <a href="http://en.cppreference.com/w/cpp/io/basic_ostream" >std::ostream</a>
@@ -621,7 +622,7 @@ private:
     /// \brief Name of configuration file. Input stream is handled internally
 	std::string configFileName;
 
-	/// \brief Flag if the input stream is handled internally. The file name is given by \ref configfileName.
+	/// \brief Flag if the input stream is handled internally. The file name is given by \ref configFileName.
 	/// The internal input file stream \ref inputFileStream is used as inut.
 	bool configFileManagedInternally = true;
 
@@ -713,8 +714,8 @@ long double strToLD (char const *str);
  *
  *
  * @param os Output stream
- * @param properties \ref Properties to be printed/streamed.
- * @return Reference to <a href="http://en.cppreference.com/w/cpp/io/basic_ostream" >std::ostream</a>
+ * @param properties \ref Properties4CXX::Properties to be printed/streamed.
+ * @return Reference to [std::ostream](http://en.cppreference.com/w/cpp/io/basic_ostream)
  */
 static inline std::ostream &operator << (std::ostream &os,const Properties4CXX::Properties &properties) {
 	properties.writeOut(os);

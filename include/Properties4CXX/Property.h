@@ -38,7 +38,7 @@
 /**
  * Define PROPERTIES4CXX_DLL_IMPORT, PROPERTIES4CXX_DLL_EXPORT, and PROPERTIES4CXX_DLL_LOCAL for Windows and Linux (ELF) ports of gcc and non-gcc compilers
  *
- * The macro definitions are highly inspired from the <a href="https://gcc.gnu.org/wiki/Visibility">GCC Wiki: Visibility</a>
+ * The macro definitions are highly inspired from the [GCC Wiki: Visibility])https://gcc.gnu.org/wiki/Visibility)
  */
 #if defined _WIN32 || defined __CYGWIN__
     #ifdef __GNUC__
@@ -83,9 +83,9 @@ class Property;
 namespace Properties4CXX {
 
 /// List of string values of a property
-/// It can be traversed with standard iterators like here <a href="http://en.cppreference.com/w/cpp/container/list/begin" >std::list::begin</a>
+/// It can be traversed with standard iterators like here [std::list::begin](http://en.cppreference.com/w/cpp/container/list/begin)
 ///
-/// \see <a href="http://en.cppreference.com/w/cpp/container/list" >std::list</a>
+/// \see [std::list](http://en.cppreference.com/w/cpp/container/list)
 typedef std::list<std::string> PropertyValueList;
 
 /// Exception thrown when an access method of class \ref Property is invoked which is not overloaded by a specific subclass
@@ -267,15 +267,15 @@ public:
 	 */
 	virtual void setStructLevel(int structLevel);
 
-	/** \brief Helper for \ref ::std::ostream &operator << (std::ostream &os,const Properties4CXX::Property &property)
+	/** \brief Helper for \ref operator << (std::ostream &os,const Properties4CXX::Property &property)
 	 *
 	 * @param os Output stream
-	 * @return Reference to <a href="http://en.cppreference.com/w/cpp/io/basic_ostream" >std::ostream</a>
+	 * @return Reference to [std::ostream](http://en.cppreference.com/w/cpp/io/basic_ostream)
 	 */
 	std::ostream &writeOut (std::ostream &os) const;
 
 	/**
-	 * Write \ref stringValue to the output stream os while writing masked characters instead of non-standard characters.
+	 * Write \p str to the output stream \p os while converting masked characters to the non-standard characters.
 	 * Non-standard characters and their masking are:
 	 *
 	 * - \\"	double quote	byte 0x22 in ASCII encoding
@@ -290,7 +290,8 @@ public:
 	 * - \\n	line feed - new line	byte 0x0a in ASCII encoding
 	 * - \\r	carriage return	byte 0x0d in ASCII encoding
 	 *
-	 * @param os Output stream to which the content of \ref stringValue is streamed
+	 * @param os Output stream to which the converted content of \p str is streamed
+	 * @param str Input string with masked characters
 	 */
 	void streamEscapedString (std::ostream &os, std::string const &str) const;
 
@@ -329,7 +330,7 @@ protected:
 	/** \brief Helper function to throw an \ref ExceptionWrongPropertyType exception when a not supported property type is requested
 	 *
 	 * @param expectedPropertyTypeName Description/name of the requested return type
-	 * @throws \ref ExceptionWrongPropertyType *always*
+	 * @throws ExceptionWrongPropertyType *always*
 	 */
 	void throwWrongTypeException (char const* expectedPropertyTypeName) const;
 
@@ -354,7 +355,7 @@ protected:
 	/** \brief Helper for \ref writeOut to stream the value of a property
 	 *
 	 * @param os Output stream
-	 * @return Reference to <a href="http://en.cppreference.com/w/cpp/io/basic_ostream" >std::ostream</a>
+	 * @return Reference to [std::ostream](http://en.cppreference.com/w/cpp/io/basic_ostream)
 	 */
 	virtual std::ostream &writeOutValue (std::ostream &os) const;
 
@@ -399,7 +400,7 @@ private:
 	/** \brief Determines if the value string was quoted or not.
 	 *
 	 * Quotation is preserved in \ref writeOut and
-	 * \ref ::std::ostream &operator << (std::ostream &os,const Properties4CXX::Property &property)
+	 * \ref operator << (std::ostream &os,const Properties4CXX::Property &property)
 	 */
 	bool isStringQuoted = true;
 
@@ -553,7 +554,6 @@ public:
 	 * This constructor creates an empty list. Value list items must be added with \ref appendString().
 	 *
 	 * @param propertyName Name of the property
-	 * @param valueList List of string values assigned to the property
 	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
 	 */
 	PropertyList(char const* propertyName, int structLevel = 0);
@@ -621,7 +621,7 @@ public:
 	/** \brief Constructor
 	 *
 	 * This constructor creates an empty property list.
-	 * Properties must be added to the list with \ref appendProperty()
+	 * Properties must be added to the list with \ref addProperty()
 	 *
 	 * @param propertyName Name of the property
 	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
@@ -631,7 +631,7 @@ public:
 	/** \brief Constructor
 	 *
 	 * This constructor creates a property list with a pre-populated list of properties.
-	 * Additional properties can be added to the list with \ref appendProperty()
+	 * Additional properties can be added to the list with \ref addProperty()
 	 *
 	 * @param propertyName Name of the property
 	 * @param propertyList List of properties.
@@ -666,7 +666,7 @@ public:
 
 	/** \brief Add a property to the property list
 	 *
-	 * @param prop Pointer to a new property. This takes ownership of the property. The caller must never delete the passed \ref prop!
+	 * @param prop Pointer to a new property. This takes ownership of the property. The caller must never delete the passed \p prop!
 	 */
 	void addProperty (Property *prop);
 
@@ -699,11 +699,12 @@ private:
 /** \brief Output stream operator for \ref Properties4CXX::Property objects.
  *
  * Please note that the helper function \ref Properties4CXX::Property::writeOut is virtual and overloaded by list and struct properties.
- * A property is always terminated by a newline. Therefore this << operator always prints a \ref std::endl.
+ * A property is always terminated by a newline. Therefore this << operator always prints a
+ * [std::endl](https://en.cppreference.com/w/cpp/io/manip/endl).
  *
  * @param os Output stream
- * @param property \ref Property to be printed/streamed.
- * @return Reference to <a href="http://en.cppreference.com/w/cpp/io/basic_ostream" >std::ostream</a>
+ * @param property \ref Properties4CXX::Property to be printed/streamed.
+ * @return Reference to [std::ostream](http://en.cppreference.com/w/cpp/io/basic_ostream)
  */
 static inline std::ostream &operator << (std::ostream &os,const Properties4CXX::Property &property) {
 	property.writeOut(os) << std::endl;
