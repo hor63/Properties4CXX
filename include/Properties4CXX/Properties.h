@@ -437,7 +437,7 @@ public:
      *
      * @param propertyName Name by which the property is searched.
      * @return Pointer to the property
-     * @throws \ref ExceptionPropertyNotFound when the exception does not exist.
+     * @throws ExceptionPropertyNotFound when the exception does not exist.
      */
     Property const *searchProperty (std::string const &propertyName) const;
 
