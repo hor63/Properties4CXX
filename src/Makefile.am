@@ -30,6 +30,10 @@ libProperties4CXX_la_LDFLAGS=$(LD_NO_UNDEFINED_OPT)
 AM_CXXFLAGS = -I$(top_srcdir)/include \
 	$(PTHREAD_CFLAGS)
 
+if OS_IS_CYGWIN
+AM_CXXFLAGS += -D_GNU_SOURCE=1
+endif
+
 BUILT_SOURCES = parser.hh
 AM_YFLAGS = -d
 

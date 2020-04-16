@@ -49,6 +49,7 @@ AC_SUBST([LIBTOOL_DEPS])
 
 AC_LANG([C++])
 
+AM_CONDITIONAL(OS_IS_CYGWIN, test "$host_os" = cygwin)
 
 AX_CHECK_COMPILE_FLAG([-fvisibility=internal],[DLL_VISIBLE_CFLAGS="-fvisibility=internal"])
 AC_SUBST([DLL_VISIBLE_CFLAGS])
