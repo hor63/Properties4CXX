@@ -106,6 +106,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
+@OS_IS_CYGWIN_TRUE@am__append_1 = -D_GNU_SOURCE=1
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_prog_doxygen.m4 \
@@ -429,9 +430,8 @@ libProperties4CXX_la_SOURCES = scanner.ll parser.yy Properties.cpp Property.cpp
 libProperties4CXX_la_LIBADD = $(PTHREAD_LIBS)
 libProperties4CXX_la_CXXFLAGS = $(AM_CXXFLAGS) -DBUILDING_PROPERTIES4CXX=1 $(DLL_VISIBLE_CFLAGS)
 libProperties4CXX_la_LDFLAGS = $(LD_NO_UNDEFINED_OPT)
-AM_CXXFLAGS = -I$(top_srcdir)/include \
-	$(PTHREAD_CFLAGS)
-
+AM_CXXFLAGS = -I$(top_srcdir)/include $(PTHREAD_CFLAGS) \
+	$(am__append_1)
 BUILT_SOURCES = parser.hh
 AM_YFLAGS = -d
 EXTRA_DIST = parserTypes.h lexer.h

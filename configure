@@ -676,6 +676,8 @@ DX_CONFIG
 DX_PROJECT
 LD_NO_UNDEFINED_OPT
 DLL_VISIBLE_CFLAGS
+OS_IS_CYGWIN_FALSE
+OS_IS_CYGWIN_TRUE
 LIBTOOL_DEPS
 CXXCPP
 LT_SYS_LIBRARY_PATH
@@ -17908,6 +17910,14 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
+ if test "$host_os" = cygwin; then
+  OS_IS_CYGWIN_TRUE=
+  OS_IS_CYGWIN_FALSE='#'
+else
+  OS_IS_CYGWIN_TRUE='#'
+  OS_IS_CYGWIN_FALSE=
+fi
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++ compiler accepts -fvisibility=internal" >&5
 $as_echo_n "checking whether C++ compiler accepts -fvisibility=internal... " >&6; }
@@ -20086,6 +20096,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${OS_IS_CYGWIN_TRUE}" && test -z "${OS_IS_CYGWIN_FALSE}"; then
+  as_fn_error $? "conditional \"OS_IS_CYGWIN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
