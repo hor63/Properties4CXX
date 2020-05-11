@@ -44,10 +44,7 @@ ExceptionWrongPropertyType::what() const noexcept {
 	return description.c_str();
 }
 
-
-
-
-Property::Property(char const* propertyName, char* const propertyValue,bool stringIsQuoted, int structLevel)
+Property::Property(char const* propertyName, char const* propertyValue,bool stringIsQuoted, int structLevel)
 	:propertyName {propertyName},
 	stringValue {propertyValue},
 	isStringValueDefined {true},
@@ -62,8 +59,6 @@ Property::Property(char const* propertyName, int structLevel)
 	isStringQuoted{false},
 	structLevel{structLevel}
 	{ }
-
-
 
 Property::~Property() {
 
@@ -237,12 +232,19 @@ void Property::streamEscapedString (std::ostream &os, std::string const &str) co
 }
 
 
-PropertyDouble::PropertyDouble(char const* propertyName, char* const propertyValue,double propertyValueDbl, int structLevel)
+PropertyDouble::PropertyDouble(char const* propertyName, char const* propertyValue,double propertyValueDbl, int structLevel)
 	:Property(propertyName,propertyValue,/*stringIsQuoted*/false,structLevel),
 	 doubleValue{propertyValueDbl}
-	 {
-		 propertyType = Double;
-	 }
+{
+	propertyType = Double;
+}
+
+PropertyDouble::PropertyDouble(char const* propertyName, double propertyValueDbl, int structLevel)
+	:Property(propertyName,std::to_string(propertyValueDbl).c_str(),/*stringIsQuoted*/false,structLevel),
+	 doubleValue{propertyValueDbl}
+{
+	propertyType = Double;
+}
 
 PropertyDouble::~PropertyDouble() {
 
@@ -258,12 +260,19 @@ double PropertyDouble::getDoubleValue() const {
 	return doubleValue;
 }
 
-PropertyInt::PropertyInt(char const* propertyName, char* const propertyValue,long long propertyValueInt, int structLevel)
+PropertyInt::PropertyInt(char const* propertyName, char const* propertyValue,long long propertyValueInt, int structLevel)
 	:Property(propertyName,propertyValue,/*stringIsQuoted*/false,structLevel),
 	 intValue{propertyValueInt}
-	 {
-		 propertyType = Integer;
-	 }
+{
+	propertyType = Integer;
+}
+
+PropertyInt::PropertyInt(char const* propertyName, long long propertyValueInt, int structLevel)
+	:Property(propertyName,std::to_string(propertyValueInt).c_str(),/*stringIsQuoted*/false,structLevel),
+	 intValue{propertyValueInt}
+{
+	propertyType = Integer;
+}
 
 PropertyInt::~PropertyInt() {
 
@@ -279,12 +288,19 @@ double PropertyInt::getDoubleValue() const {
 	return double (intValue);
 }
 
-PropertyBool::PropertyBool(char const* propertyName, char* const propertyValue,bool propertyValueBool, int structLevel)
+PropertyBool::PropertyBool(char const* propertyName, char const* propertyValue,bool propertyValueBool, int structLevel)
 	:Property(propertyName,propertyValue,/*stringIsQuoted*/false,structLevel),
+	boolValue{propertyValueBool}
+{
+	propertyType = Bool;
+}
+
+PropertyBool::PropertyBool(char const* propertyName, bool propertyValueBool, int structLevel)
+	:Property(propertyName,propertyValueBool?"true":"false",/*stringIsQuoted*/false,structLevel),
 	 boolValue{propertyValueBool}
-	 {
-		 propertyType = Bool;
-	 }
+ {
+	propertyType = Bool;
+ }
 
 PropertyBool::~PropertyBool() {
 

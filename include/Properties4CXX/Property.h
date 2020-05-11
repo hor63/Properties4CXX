@@ -136,7 +136,7 @@ public:
 	 * 	Thus quotation is preserved when a configuration is written out
 	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
 	 */
-	Property(char const* propertyName, char* const propertyValue,bool stringIsQuoted = true, int structLevel = 0);
+	Property(char const* propertyName, char const* propertyValue,bool stringIsQuoted = true, int structLevel = 0);
 
 	/** \brief Destructor
 	 */
@@ -373,9 +373,6 @@ protected:
 	 */
 	int structLevel = 0;
 
-
-
-
 	/** \brief Un-quoted string value
 	 *
 	 * String value is always stored without potential surrounding quotation.
@@ -424,14 +421,22 @@ public:
 	 * @param propertyValueDbl double float value of the property as binary value
 	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
 	 */
-	PropertyDouble(char const* propertyName, char* const propertyValue,double propertyValueDbl, int structLevel = 0);
+	PropertyDouble(char const* propertyName, char const* propertyValue,double propertyValueDbl, int structLevel = 0);
+
+	/** \brief Constructor
+	 *
+	 * The string value is determined by std::to_string(propertyValueDbl)
+	 *
+	 * @param propertyName Name of the property
+	 * @param propertyValueDbl double float value of the property as binary value
+	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
+	 */
+	PropertyDouble(char const* propertyName, double propertyValueDbl, int structLevel = 0);
 
 	/** \brief Destructor
 	 * Destructor. Virtual is a must here because it will be overloaded.
 	 */
 	virtual ~PropertyDouble();
-
-
 
 	/** \brief Return the integer value of the property.
 	 *
@@ -471,7 +476,17 @@ public:
 	 * @param propertyValueInt long long int value of the property as binary value
 	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
 	 */
-	PropertyInt(char const* propertyName, char* const propertyValue,long long propertyValueInt, int structLevel = 0);
+	PropertyInt(char const* propertyName, char const* propertyValue,long long propertyValueInt, int structLevel = 0);
+
+		/** \brief Constructor
+		 *
+		 * The string value is determined by std::to_string(propertyValueInt)
+		 *
+		 * @param propertyName Name of the property
+		 * @param propertyValueInt long long int value of the property as binary value
+		 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
+		 */
+		PropertyInt(char const* propertyName, long long propertyValueInt, int structLevel = 0);
 
 	/** \brief Destructor
 	 * Virtual is a must here because it will be overloaded.
@@ -518,7 +533,17 @@ public:
 	 * @param propertyValueBool bool value of the property as binary value
 	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
 	 */
-	PropertyBool(char const* propertyName, char* const propertyValue,bool propertyValueBool, int structLevel = 0);
+	PropertyBool(char const* propertyName, char const* propertyValue,bool propertyValueBool, int structLevel = 0);
+
+	/** \brief Constructor
+	 *
+	 * The string value is hard-coded "true" or "false" based on the value of \p propertyValueBool
+	 *
+	 * @param propertyName Name of the property
+	 * @param propertyValueBool bool value of the property as binary value
+	 * @param structLevel Number of the structure level on which this property resides. Base level is 0.
+	 */
+	PropertyBool(char const* propertyName, bool propertyValueBool, int structLevel = 0);
 
 	/** \brief Destructor
 	 *
