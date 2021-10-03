@@ -76,13 +76,13 @@ Properties4CXX::Properties	*properties;
 Properties4CXX::PropertyValueList *propertyValueList;
 }
 
-%destructor { delete $$->str;     delete $$;	} <string>
-%destructor { delete $$->numStr;  delete $$;	} <numVal>
-%destructor { delete $$->intStr;  delete $$;	} <intVal>
-%destructor { delete $$->boolStr; delete $$;	} <boolVal>
-%destructor { delete $$; 						} <property>
-%destructor { delete $$; 						} <properties>
-%destructor { delete $$; 						} <propertyValueList>
+%destructor { delete $$; } <string>
+%destructor { delete $$; } <numVal>
+%destructor { delete $$; } <intVal>
+%destructor { delete $$; } <boolVal>
+%destructor { delete $$; } <property>
+%destructor { delete $$; } <properties>
+%destructor { delete $$; } <propertyValueList>
 
 %token <string>           LEX_IDENTIFIER
 %token <string>           LEX_STRING
@@ -153,40 +153,40 @@ errorProperty :  error 	 LEX_END_OF_LINE
 	;
 
 stringProperty : LEX_IDENTIFIER LEX_ASSIGN stringVal LEX_END_OF_LINE
-	{ $$ = new Properties4CXX::Property ( $1->str,$3->str,$3->isQuotedString);
-	  delete $1->str; delete $1; $1 = 0; delete $3->str; delete $3; $3 = 0; }
+	{ $$ = new Properties4CXX::Property ( $1->str.c_str(),$3->str.c_str(),$3->isQuotedString);
+	  delete $1; $1 = 0; delete $3; $3 = 0; }
 	;
 
 numProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_DOUBLE LEX_END_OF_LINE
-	{ $$ = new Properties4CXX::PropertyDouble ( $1->str,$3->numStr,$3->numVal); 
-	  delete $1->str; delete $1; $1 = 0; delete $3->numStr; delete $3; $3 = 0; }
+	{ $$ = new Properties4CXX::PropertyDouble ( $1->str.c_str(),$3->numStr.c_str(),$3->numVal); 
+	  delete $1; $1 = 0; delete $3; $3 = 0; }
 	;
 
 intProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_INTEGER LEX_END_OF_LINE
-	{ $$ = new Properties4CXX::PropertyInt ( $1->str,$3->intStr,$3->intVal);  
-	  delete $1->str; delete $1; $1 = 0; delete $3->intStr; delete $3; $3 = 0; }
+	{ $$ = new Properties4CXX::PropertyInt ( $1->str.c_str(),$3->intStr.c_str(),$3->intVal);  
+	  delete $1; $1 = 0; delete $3; $3 = 0; }
 	;
 
 boolProperty : LEX_IDENTIFIER LEX_ASSIGN LEX_BOOL LEX_END_OF_LINE
-	{ $$ = new Properties4CXX::PropertyBool ( $1->str,$3->boolStr,$3->boolVal);   
-	  delete $1->str; delete $1; $1 = 0; delete $3->boolStr; delete $3; $3 = 0; }
+	{ $$ = new Properties4CXX::PropertyBool ( $1->str.c_str(),$3->boolStr.c_str(),$3->boolVal);   
+	  delete $1; $1 = 0; delete $3; $3 = 0; }
 	;
 
 propertyList : LEX_IDENTIFIER LEX_ASSIGN propertyListList LEX_END_OF_LINE
-	{ $$ = new Properties4CXX::PropertyList ($1->str,*$3);
-	  delete $1->str; delete $1; $1 = 0; delete $3; $3 = 0; }
+	{ $$ = new Properties4CXX::PropertyList ($1->str.c_str(),*$3);
+	  delete $1; $1 = 0; delete $3; $3 = 0; }
 		
 propertyStruct : LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN properties LEX_BRACKETCLOSE LEX_END_OF_LINE
-	{ $$ = new Properties4CXX::PropertyStruct ($1->str,*$4);
-	  delete $1->str; delete $1; $1 = 0; delete $4; $4 = 0; }
+	{ $$ = new Properties4CXX::PropertyStruct ($1->str.c_str(),*$4);
+	  delete $1; $1 = 0; delete $4; $4 = 0; }
 	| LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN error LEX_BRACKETCLOSE  LEX_END_OF_LINE
 	{ $$ = 0; // erroneous structure
-	  delete $1->str; delete $1; $1 = 0;
+	  delete $1; $1 = 0;
 	}
 	| LEX_IDENTIFIER LEX_ASSIGN LEX_BRACKETOPEN properties
 	{
-	    $$ = new Properties4CXX::PropertyStruct ($1->str,*$4);
-	 	delete $1->str; delete $1; $1 = 0; delete $4; $4 = 0; 
+	    $$ = new Properties4CXX::PropertyStruct ($1->str.c_str(),*$4);
+	 	delete $1; $1 = 0; delete $4; $4 = 0; 
 		yyerror (scanner, props, "Found opening '{' without closing '}'");
 		YYERROR;
 	}
@@ -200,14 +200,14 @@ propertyListList :
 	stringVal LEX_COMMA stringVal { 
 		$$ = new Properties4CXX::PropertyValueList;
 		$$->push_back($1->str);
-		delete $1->str; delete $1; $1 = 0;
+		delete $1; $1 = 0;
 		$$->push_back($3->str);
-		delete $3->str; delete $3; $3 = 0;
+		delete $3; $3 = 0;
 		}
 	| propertyListList LEX_COMMA stringVal {
 		$$ = $1;
 		$$->push_back($3->str);
-		delete $3->str; delete $3; $3 = 0;
+		delete $3; $3 = 0;
 		}
 	;
 		

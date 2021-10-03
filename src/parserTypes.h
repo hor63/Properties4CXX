@@ -27,28 +27,29 @@
 #ifndef SRC_PARSERTYPES_H_
 #define SRC_PARSERTYPES_H_
 
+#include <string>
 
 /***************************************************************************/
 /* Structures to store non-string values together with the original string */
 
 typedef struct {
 	bool isQuotedString;
-	char *str;
+	std::string str;
 	} tStrVal;
 
 typedef struct {
 	long double numVal;
-	char *numStr;
+	std::string numStr;
 	} tNumVal;
 
 typedef struct {
 	long long intVal;
-	char *intStr;
+	std::string intStr;
 	} tIntVal;
 
 typedef struct {
 	bool  boolVal;
-	char *boolStr;
+	std::string boolStr;
 	} tBoolVal;
 
 

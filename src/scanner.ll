@@ -42,7 +42,7 @@
 #include "parser.hh"
 
 static void yy_countlines (char const* text, yyscan_t yyscanner);
-static char *scanQuotedString (char const *quotedText);
+std::string scanQuotedString (char const *quotedText);
 
 // Overwrite the input macro to read from the configuration input stream.
 #if defined YY_INPUT
@@ -153,8 +153,7 @@ exp      ([eE][+-]?[0-9]+)
 [+-]?{decnum}                         { /* Simple integer */
                                         yylval->intVal = new tIntVal;
                                         yylval->intVal->intVal = Properties4CXX::strToLL(yytext);
-                                        yylval->intVal->intStr = new char[strlen (yytext) + 1];
-                                        strcpy(yylval->intVal->intStr ,yytext);
+                                        yylval->intVal->intStr = yytext;
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_INTEGER);
                                       }
@@ -163,8 +162,7 @@ exp      ([eE][+-]?[0-9]+)
 0[0-7]*                               { /* Octal number (incl. 0) */
                                         yylval->intVal = new tIntVal;
                                         yylval->intVal->intVal = Properties4CXX::strOctToLL(yytext);
-                                        yylval->intVal->intStr = new char[strlen (yytext) + 1];
-                                        strcpy(yylval->intVal->intStr ,yytext);
+                                        yylval->intVal->intStr = yytext;
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_INTEGER);
                                       }
@@ -172,8 +170,7 @@ exp      ([eE][+-]?[0-9]+)
 0[bB][01]+                               { /* Binary number */
                                         yylval->intVal = new tIntVal;
                                         yylval->intVal->intVal = Properties4CXX::strBinToLL(yytext);
-                                        yylval->intVal->intStr = new char[strlen (yytext) + 1];
-                                        strcpy(yylval->intVal->intStr ,yytext);
+                                        yylval->intVal->intStr = yytext;
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_INTEGER);
                                       }
@@ -182,8 +179,7 @@ exp      ([eE][+-]?[0-9]+)
 {hexnum}                              { /* hexadecimal number */
                                         yylval->intVal = new tIntVal;
                                         yylval->intVal->intVal = Properties4CXX::strHexToLL(yytext);
-                                        yylval->intVal->intStr = new char[strlen (yytext) + 1];
-                                        strcpy(yylval->intVal->intStr ,yytext);
+                                        yylval->intVal->intStr = yytext;
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_INTEGER);
                                       }
@@ -195,8 +191,7 @@ exp      ([eE][+-]?[0-9]+)
 										 */
                                         yylval->numVal = new tNumVal;
                                         yylval->numVal->numVal = Properties4CXX::strToLD(yytext);
-                                        yylval->numVal->numStr = new char[strlen (yytext) + 1];
-                                        strcpy(yylval->numVal->numStr ,yytext);
+                                        yylval->numVal->numStr = yytext;
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_DOUBLE);
                                       }
@@ -207,8 +202,7 @@ exp      ([eE][+-]?[0-9]+)
 									    */
                                         yylval->numVal = new tNumVal;
                                         yylval->numVal->numVal = Properties4CXX::strToLD(yytext);
-                                        yylval->numVal->numStr = new char[strlen (yytext) + 1];
-                                        strcpy(yylval->numVal->numStr ,yytext);
+                                        yylval->numVal->numStr = yytext;
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_DOUBLE);
                                       }
@@ -220,8 +214,7 @@ exp      ([eE][+-]?[0-9]+)
 									    */
                                         yylval->numVal = new tNumVal;
                                         yylval->numVal->numVal = Properties4CXX::strToLD(yytext);
-                                        yylval->numVal->numStr = new char[strlen (yytext) + 1];
-                                        strcpy(yylval->numVal->numStr ,yytext);
+                                        yylval->numVal->numStr = yytext;
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_DOUBLE);
                                       }
@@ -230,8 +223,7 @@ exp      ([eE][+-]?[0-9]+)
 ([yY][eE][sS])|([tT][rR][uU][eE])|([oO][nN]) { /* yes, true, on case insensitive */
                                         yylval->boolVal = new tBoolVal;
                                         yylval->boolVal->boolVal = true;
-                                        yylval->boolVal->boolStr = new char[strlen (yytext) + 1];
-                                        strcpy(yylval->boolVal->boolStr ,yytext);
+                                        yylval->boolVal->boolStr = yytext;
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_BOOL);
                                       }
@@ -240,8 +232,7 @@ exp      ([eE][+-]?[0-9]+)
 ([nN][oO])|([fF][aA][lL][sS][eE])|([oO][fF][fF]) { /* no, false, off case insensitive */
                                         yylval->boolVal = new tBoolVal;
                                         yylval->boolVal->boolVal = false;
-                                        yylval->boolVal->boolStr = new char[strlen (yytext) + 1];
-                                        strcpy(yylval->boolVal->boolStr ,yytext);
+                                        yylval->boolVal->boolStr = yytext;
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_BOOL);
                                       }
@@ -261,8 +252,7 @@ exp      ([eE][+-]?[0-9]+)
 
 [^\r\n \xc\t\"\{\},=]+	              {
                                         yylval->string = new tStrVal;
-                                        yylval->string->str = new char[strlen(yytext)+1];
-                                        strcpy(yylval->string->str, yytext);
+                                        yylval->string->str = yytext;
                                         yylval->string->isQuotedString = false;
                                         yyset_column ( yyget_column(yyscanner) + strlen(yytext),yyscanner);
                                         return (LEX_IDENTIFIER);
@@ -303,13 +293,14 @@ static void yy_countlines (char const* text, yyscan_t yyscanner)
 
 }
 
-static char *scanQuotedString (char const *quotedText) {
+std::string scanQuotedString (char const *quotedText) {
+std::string rc;
 char* outString = new char[strlen(quotedText)];
 int k=0;
 char c;
 
     // Run through the string from the 2nd character, i.e. leave the initial double-quote out
-	for (quotedText++; *quotedText != '"'; quotedText ++) {
+	for (++quotedText; *quotedText != '"'; ++quotedText) {
 		if (*quotedText == '\\') {
 		  // Here is a masked character
 		  quotedText++;
@@ -354,5 +345,8 @@ char c;
 
 	outString[k] = '\0';
 
-	return outString;
+	rc = outString;
+	delete [] outString;
+
+	return rc;
 }
