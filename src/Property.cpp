@@ -46,18 +46,18 @@ ExceptionWrongPropertyType::what() const noexcept {
 
 Property::Property(char const* propertyName, char const* propertyValue,bool stringIsQuoted, int structLevel)
 	:propertyName {propertyName},
+	structLevel{structLevel},
 	stringValue {propertyValue},
 	isStringValueDefined {true},
-	isStringQuoted{stringIsQuoted},
-	structLevel{structLevel},
-	propertyType{String}
+	propertyType{String},
+	isStringQuoted{stringIsQuoted}
 	{ }
 
 Property::Property(char const* propertyName, int structLevel)
 	:propertyName {propertyName},
+	structLevel{structLevel},
 	isStringValueDefined {false},
-	isStringQuoted{false},
-	structLevel{structLevel}
+	isStringQuoted{false}
 	{ }
 
 Property::~Property() {

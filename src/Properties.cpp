@@ -58,14 +58,14 @@ Properties::Properties ()
 { }
 
 Properties::Properties (char const *configFileName)
-:configFileManagedInternally{true},
- configFileName{configFileName},
+:configFileName{configFileName},
+ configFileManagedInternally{true},
  inputStream{0}
 { }
 
 Properties::Properties (std::string const &configFileName)
-:configFileManagedInternally{true},
- configFileName{configFileName},
+:configFileName{configFileName},
+ configFileManagedInternally{true},
  inputStream{0}
 { }
 
