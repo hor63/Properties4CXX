@@ -245,7 +245,7 @@ int main(int argc,char**argv) {
 	// test the exception
 	testDouble (props, "prop121", -.12345678E+2);
 
-	char const *(listValues[]) = {
+	char const *listValues[] = {
 			" item1 " ,
 			"item2",
 			" Item\t3\nand a newline ",
