@@ -31,7 +31,7 @@
 #include "Properties4CXX/Property.h"
 
 #include <sstream>
-#include <math.h>
+#include <cmath>
 
 namespace Properties4CXX {
 
