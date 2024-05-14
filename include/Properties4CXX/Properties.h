@@ -707,6 +707,13 @@ long long strHexToLL (char const *str);
  */
 long double strToLD (char const *str);
 
+/** Convert a double value to a std::string
+ * independent from the locale
+ *
+ * This function implements a string conversion that is independent from the
+ * locale dependent decimal separator (e.g. '.' or '.') but always uses '.'.
+ */
+std::string dToStr (double val);
 
 }; // namespace Properties4CXX {
 

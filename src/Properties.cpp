@@ -27,6 +27,7 @@
 #  include "config.h"
 #endif
 
+#include <charconv>
 
 #include "parserTypes.h"
 #include "Properties4CXX/Properties.h"
@@ -441,6 +442,16 @@ long double strToLD (char const *str){
 	}
 
 	return rc;
+}
+
+std::string dToStr (double val) {
+	char buf[32];
+	auto rc = std::to_chars(buf,buf + (sizeof(buf) - 1U),val);
+
+	if (rc.ec == std::errc()){}
+	*rc.ptr = '\0';
+
+	return std::string(buf);
 }
 
 } // namespace Properties4CXX {
