@@ -293,6 +293,9 @@ int main(int argc,char**argv) {
 	// test the exception
 	testBool(props,"prop142",false);
 
+	// Test locale independence upon writing new values.
+	props.addProperty(new Properties4CXX::PropertyDouble("newProp01",123.456));
+	props.addProperty(new Properties4CXX::PropertyDouble("newProp02",-12345.678E+2));
 
 	outStream.open("PropertiesTestWrite.properties",outStream.out);
 	props.writeOut(outStream);

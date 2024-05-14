@@ -240,7 +240,7 @@ PropertyDouble::PropertyDouble(char const* propertyName, char const* propertyVal
 }
 
 PropertyDouble::PropertyDouble(char const* propertyName, double propertyValueDbl, int structLevel)
-	:Property(propertyName,std::to_string(propertyValueDbl).c_str(),/*stringIsQuoted*/false,structLevel),
+	:Property(propertyName,dToStr(propertyValueDbl).c_str(),/*stringIsQuoted*/false,structLevel),
 	 doubleValue{propertyValueDbl}
 {
 	propertyType = Double;
