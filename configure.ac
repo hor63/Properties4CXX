@@ -18,7 +18,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([Properties4CXX],[1.0],[https://github.com/hor63/Properties4CXX/issues],[Properties4CXX],https://github.com/hor63/Properties4CXX)
+AC_INIT([Properties4CXX],[1.1.1],[https://github.com/hor63/Properties4CXX/issues],[Properties4CXX],https://github.com/hor63/Properties4CXX)
 AC_CONFIG_HEADERS(config.h)
 
 AC_CONFIG_MACRO_DIRS([m4])
@@ -32,7 +32,7 @@ AM_DEFAULT_VERBOSITY=0
 AC_PROG_YACC
 AC_PROG_LEX
 AC_PROG_CXX
-AX_CXX_COMPILE_STDCXX_14(ext, mandatory)
+AX_CXX_COMPILE_STDCXX_17(ext, mandatory)
 AX_PTHREAD()
 
 # get a suitable command like mkdir -p on LINUX systems use install if mkdir -p does not work.
