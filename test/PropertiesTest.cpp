@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <clocale>
 
 #include "Properties4CXX/Properties.h"
 #include "Properties4CXX/Property.h"
@@ -146,6 +147,9 @@ static void testList (Properties4CXX::Properties const &props,const char* propNa
 
 
 int main(int argc,char**argv) {
+
+	// Allow locale setting to become effective
+	std::setlocale (LC_ALL, "");
 
 	std::ofstream outStream;
 
