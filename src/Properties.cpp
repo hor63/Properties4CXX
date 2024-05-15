@@ -448,7 +448,6 @@ std::string dToStr (double val) {
 	char buf[32];
 	auto rc = std::to_chars(buf,buf + (sizeof(buf) - 1U),val);
 
-	if (rc.ec == std::errc()){}
 	*rc.ptr = '\0';
 
 	return std::string(buf);
